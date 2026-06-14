@@ -27,7 +27,7 @@ const LIFE_AREAS = [
 ] as const;
 
 export default function CapturePage() {
-  const [captureType, setCaptureType] = useState(CAPTURE_TYPES[0].value);
+  const [captureType, setCaptureType] = useState<string>(CAPTURE_TYPES[0].value);
   const [lifeArea, setLifeArea] = useState<string>(LIFE_AREAS[0]);
   const [content, setContent] = useState("");
   const contentRef = useRef<HTMLTextAreaElement>(null);
