@@ -3,17 +3,27 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --webpack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:migrate:finance": "node scripts/apply-migration.mjs supabase/migrations/20260615140000_create_finance_entries.sql",
+    "db:migrate:finance-budget": "node scripts/apply-migration.mjs supabase/migrations/20260615150000_create_finance_budget.sql",
+    "db:seed:finance-entries": "node scripts/apply-migration.mjs supabase/seeds/20260615160000_seed_finance_entries.sql",
+    "db:clear:finance": "node scripts/clear-finance-data.mjs",
+    "db:seed:finance-baseline": "node scripts/seed-finance-baseline.mjs"
   },
   "dependencies": {
+    "@connectrpc/connect": "^2.1.2",
+    "@connectrpc/connect-node": "^2.1.2",
+    "@cursor/sdk": "^1.0.19",
     "@supabase/supabase-js": "^2.107.0",
     "lucide-react": "^1.18.0",
     "next": "15.5.19",
+    "openai": "^6.42.0",
     "react": "18.3.1",
-    "react-dom": "18.3.1"
+    "react-dom": "18.3.1",
+    "recharts": "^3.8.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -22,6 +32,7 @@
     "@types/react-dom": "^18",
     "eslint": "^9",
     "eslint-config-next": "15.5.19",
+    "pg": "^8.21.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

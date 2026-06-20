@@ -1,187 +1,218 @@
 "use client";
 
-import { useRef, useState } from "react";
+import "./capture.css";
+import { useState, useRef } from "react";
+import { Sparkles, Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { CAPTURE_TYPE_VALUES, LIFE_AREA_VALUES } from "@/lib/capture/constants";
 
-const CAPTURE_TYPES = [
-  { value: "decision", label: "Decision" },
-  { value: "journal", label: "Journal" },
-  { value: "lesson", label: "Lesson" },
-  { value: "idea", label: "Idea" },
-  { value: "note", label: "Note" },
-  { value: "prayer", label: "Prayer" },
-  { value: "book_note", label: "Book Note" },
-  { value: "goal_update", label: "Goal Update" },
-  { value: "reflection", label: "Reflection" },
-  { value: "other", label: "Other" },
-] as const;
+/* ── Types ── */
 
-const LIFE_AREAS = [
-  "Finance",
-  "Health",
-  "Career",
-  "Learning",
-  "Spiritual",
-  "Relationships",
-  "General",
-] as const;
+type OrganizeResponse = {
+  title: string;
+  enhanced_content: string;
+  capture_type: string;
+  life_area: string;
+  tags: string[];
+};
 
-export default function CapturePage() {
-  const [captureType, setCaptureType] = useState<string>(CAPTURE_TYPES[0].value);
-  const [lifeArea, setLifeArea] = useState<string>(LIFE_AREAS[0]);
-  const [content, setContent] = useState("");
-  const contentRef = useRef<HTMLTextAreaElement>(null);
-  const [saving, setSaving] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+/* ── Constants ── */
 
-  const canSave = content.trim().length > 0 && !saving;
+const CAPTURE_TYPES = ["Note", "Decision", "Journal", "Lesson", "Idea", "Prayer", "Book Note", "Goal Update", "Reflection"];
+const LIFE_AREAS    = ["General", "Finance", "Health", "Career", "Learning", "Spiritual", "Relationships"];
 
-  function handleContentChange(value: string) {
-    setContent(value);
+const TYPE_MAP: Record<string, string> = {
+  "Note": "note", "Decision": "decision", "Journal": "journal",
+  "Lesson": "lesson", "Idea": "idea", "Prayer": "prayer",
+  "Book Note": "book_note", "Goal Update": "goal_update", "Reflection": "reflection",
+};
+
+/* ── Page ── */
+
+export default function WritePage() {
+  const [content,     setContent]     = useState("");
+  const [captureType, setCaptureType] = useState("Note");
+  const [lifeArea,    setLifeArea]    = useState("General");
+  const [organizing,  setOrganizing]  = useState(false);
+  const [saving,      setSaving]      = useState(false);
+  const [toast,       setToast]       = useState<string | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const dateStr = new Date().toLocaleDateString("en-GB", {
+    weekday: "long", day: "numeric", month: "long", year: "numeric",
+  }).toUpperCase();
+
+  function showToast(msg: string) {
+    setToast(msg);
+    window.setTimeout(() => setToast(null), 2400);
   }
 
-  async function handleSave() {
-    const rawContent = contentRef.current?.value ?? content;
-    const trimmedContent = rawContent.trim();
-    if (!trimmedContent || saving) return;
-
-    setSaving(true);
-    setError(null);
-    setSuccess(false);
+  async function handleAIOrganize() {
+    const text = content.trim();
+    if (!text || organizing || saving) return;
+    setOrganizing(true);
 
     try {
-      const { error: insertError } = await supabase.from("entries").insert({
-        capture_type: captureType,
-        life_area: lifeArea,
-        content: trimmedContent,
-        created_at: new Date().toISOString(),
+      const res = await fetch("/api/organize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
       });
+      const data: unknown = await res.json();
+      if (!res.ok) { showToast("AI organize failed"); return; }
 
-      if (insertError) {
-        setError(insertError.message);
-        return;
-      }
+      const result = data as OrganizeResponse;
 
-      setCaptureType(CAPTURE_TYPES[0].value);
-      setLifeArea(LIFE_AREAS[0]);
-      setContent("");
-      if (contentRef.current) {
-        contentRef.current.value = "";
-      }
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
+      /* update type chip */
+      const mappedType = Object.entries(TYPE_MAP).find(([, v]) => v === result.capture_type)?.[0];
+      if (mappedType) setCaptureType(mappedType);
+
+      /* update area chip */
+      const areaLabel = LIFE_AREAS.find(
+        (a) => a.toLowerCase() === result.life_area.toLowerCase()
+      );
+      if (areaLabel) setLifeArea(areaLabel);
+
+      /* update content with enhanced version */
+      setContent(result.title ? `${result.title}\n\n${result.enhanced_content}` : result.enhanced_content);
+      showToast("AI organised your entry");
+    } catch {
+      showToast("Could not reach AI");
     } finally {
-      setSaving(false);
+      setOrganizing(false);
     }
   }
 
+  async function handleCapture() {
+    const text = content.trim();
+    if (!text || saving) return;
+    setSaving(true);
+
+    const rawType  = TYPE_MAP[captureType] ?? "note";
+    const rawArea  = LIFE_AREA_VALUES.has(lifeArea) ? lifeArea : "General";
+    const finalType = CAPTURE_TYPE_VALUES.has(rawType) ? rawType : "note";
+
+    const { error } = await supabase.from("entries").insert({
+      capture_type: finalType,
+      life_area:    rawArea,
+      content:      text,
+      title:        null,
+      raw_content:  text,
+      tags:         null,
+      created_at:   new Date().toISOString(),
+    });
+
+    if (error) {
+      showToast("Failed to save");
+    } else {
+      setContent("");
+      setCaptureType("Note");
+      setLifeArea("General");
+      showToast("Captured ✓");
+      textareaRef.current?.focus();
+    }
+
+    setSaving(false);
+  }
+
+  const hasContent = content.trim().length > 0;
+  const busy = organizing || saving;
+
   return (
-    <div className="flex min-h-full flex-col bg-zinc-50 dark:bg-zinc-950">
-      <main className="mx-auto flex w-full max-w-lg flex-1 flex-col px-4 py-6 sm:px-6">
-        <header className="mb-6">
-          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-            Capture
-          </h1>
-          <p className="mt-1 text-base text-zinc-600 dark:text-zinc-400">
-            Save a thought, decision, or moment.
-          </p>
-        </header>
+    <div className="write-page">
 
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            void handleSave();
-          }}
-          className="flex flex-1 flex-col gap-5"
-        >
-          <div className="flex flex-col gap-2">
-            <label
-              htmlFor="capture_type"
-              className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
-            >
-              Type
-            </label>
-            <select
-              id="capture_type"
-              value={captureType}
-              onChange={(e) => setCaptureType(e.target.value)}
-              className="h-14 w-full rounded-xl border border-zinc-300 bg-white px-4 text-lg text-zinc-900 outline-none transition-colors focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:focus:border-zinc-500 dark:focus:ring-zinc-800"
-            >
-              {CAPTURE_TYPES.map((type) => (
-                <option key={type.value} value={type.value}>
-                  {type.label}
-                </option>
-              ))}
-            </select>
-          </div>
+      {/* Masthead */}
+      <div className="write-masthead">
+        <span className="write-brand">LIFE·OS</span>
+        <span className="write-date">{dateStr}</span>
+      </div>
 
-          <div className="flex flex-col gap-2">
-            <label
-              htmlFor="life_area"
-              className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
-            >
-              Life Area
-            </label>
-            <select
-              id="life_area"
-              value={lifeArea}
-              onChange={(e) => setLifeArea(e.target.value)}
-              className="h-14 w-full rounded-xl border border-zinc-300 bg-white px-4 text-lg text-zinc-900 outline-none transition-colors focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:focus:border-zinc-500 dark:focus:ring-zinc-800"
-            >
-              {LIFE_AREAS.map((area) => (
-                <option key={area} value={area}>
-                  {area}
-                </option>
-              ))}
-            </select>
-          </div>
+      <div className="write-body">
 
-          <div className="flex flex-col gap-2">
-            <label
-              htmlFor="content"
-              className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
+        <h1 className="write-title">Capture.</h1>
+        <p className="write-subtitle">What is on your mind right now?</p>
+
+        {/* Type chips */}
+        <div className="write-chips-label">TYPE</div>
+        <div className="write-chips-scroll">
+          {CAPTURE_TYPES.map((t) => (
+            <button
+              key={t}
+              type="button"
+              className={`write-chip${captureType === t ? " write-chip--active" : ""}`}
+              onClick={() => setCaptureType(t)}
+              disabled={busy}
             >
-              Content
-            </label>
-            <textarea
-              ref={contentRef}
-              id="content"
-              name="content"
-              value={content}
-              onChange={(e) => handleContentChange(e.target.value)}
-              onInput={(e) => handleContentChange(e.currentTarget.value)}
-              placeholder="What's on your mind?"
-              rows={8}
-              className="min-h-48 w-full resize-y rounded-xl border border-zinc-300 bg-white px-4 py-4 text-lg leading-relaxed text-zinc-900 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:placeholder:text-zinc-500 dark:focus:border-zinc-500 dark:focus:ring-zinc-800"
-            />
-          </div>
+              {t}
+            </button>
+          ))}
+        </div>
 
-          {error && (
-            <p className="rounded-xl bg-red-50 px-4 py-3 text-base text-red-700 dark:bg-red-950 dark:text-red-300">
-              {error}
-            </p>
-          )}
+        {/* Textarea */}
+        <div className="write-textarea-wrap">
+          <textarea
+            ref={textareaRef}
+            className="write-textarea"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder={`Write anything —\na ${captureType.toLowerCase()}, lesson, prayer, idea,\nor thought that matters to you...`}
+            disabled={busy}
+          />
+        </div>
 
-          {success && (
-            <p className="rounded-xl bg-green-50 px-4 py-3 text-base font-medium text-green-700 dark:bg-green-950 dark:text-green-300">
-              Saved successfully!
-            </p>
-          )}
+        <div className="write-textarea-footer">
+          <span className="write-textarea-hint">start writing...</span>
+          <span className="write-textarea-status">{captureType} · {lifeArea}</span>
+        </div>
+
+        {/* Area chips */}
+        <div className="write-chips-label">LIFE AREA</div>
+        <div className="write-area-chips">
+          {LIFE_AREAS.map((a) => (
+            <button
+              key={a}
+              type="button"
+              className={`write-area-chip${lifeArea === a ? " write-area-chip--active" : ""}`}
+              onClick={() => setLifeArea(a)}
+              disabled={busy}
+            >
+              {a}
+            </button>
+          ))}
+        </div>
+
+        {/* Actions */}
+        <div className="write-actions">
+          <button
+            type="button"
+            className="write-btn-ai"
+            onClick={() => void handleAIOrganize()}
+            disabled={!hasContent || busy}
+          >
+            {organizing ? (
+              <Loader2 size={14} strokeWidth={2} style={{ animation: "spin 1s linear infinite" }} />
+            ) : (
+              <Sparkles size={14} strokeWidth={1.75} />
+            )}
+            AI Organize
+          </button>
 
           <button
             type="button"
-            onClick={() => void handleSave()}
-            className={`h-14 w-full rounded-xl text-lg font-semibold transition-colors ${
-              canSave
-                ? "cursor-pointer bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
-                : "cursor-not-allowed bg-zinc-300 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-600"
-            }`}
+            className="write-btn-capture"
+            onClick={() => void handleCapture()}
+            disabled={!hasContent || busy}
           >
-            {saving ? "Saving…" : "Save"}
+            {saving ? "Saving…" : "Capture"}
           </button>
-        </form>
-      </main>
+        </div>
+
+      </div>
+
+      {/* Toast */}
+      {toast && <div className="write-toast">{toast}</div>}
+
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }

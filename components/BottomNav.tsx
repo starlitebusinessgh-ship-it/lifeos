@@ -2,49 +2,137 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  CalendarDays,
-  List,
-  PenLine,
-  ScrollText,
-} from "lucide-react";
+import { Home, LayoutGrid, PenLine, AlignJustify } from "lucide-react";
 
-const tabs = [
-  { href: "/capture", label: "Capture", icon: PenLine },
-  { href: "/today", label: "Today", icon: CalendarDays },
-  { href: "/entries", label: "Entries", icon: List },
-  { href: "/principles", label: "Principles", icon: ScrollText },
+const TABS = [
+  { href: "/today",   label: "NOW",   Icon: Home          },
+  { href: "/spaces",  label: "LIFE",  Icon: LayoutGrid    },
+  { href: "/capture", label: "WRITE", Icon: PenLine, fab: true },
+  { href: "/entries", label: "FEED",  Icon: AlignJustify  },
 ] as const;
 
 export default function BottomNav() {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
+
+  function isActive(href: string) {
+    return pathname === href || pathname.startsWith(`${href}/`);
+  }
 
   return (
     <nav
       aria-label="Main navigation"
-      className="fixed bottom-0 left-0 right-0 z-50 border-t border-zinc-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 dark:border-zinc-800 dark:bg-zinc-950/95 dark:supports-[backdrop-filter]:bg-zinc-950/80"
-      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      style={{
+        position: "fixed",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: 50,
+        backgroundColor: "#EDE9E1",
+        borderTop: "1px solid rgba(30,28,24,0.09)",
+        paddingBottom: "env(safe-area-inset-bottom)",
+      }}
     >
-      <div className="mx-auto flex h-16 max-w-lg items-stretch px-2">
-        {tabs.map(({ href, label, icon: Icon }) => {
-          const isActive =
-            pathname === href || pathname.startsWith(`${href}/`);
+      <div
+        style={{
+          display: "flex",
+          maxWidth: "32rem",
+          margin: "0 auto",
+          height: "4rem",
+          alignItems: "center",
+          padding: "0 0.25rem",
+        }}
+      >
+        {TABS.map(({ href, label, Icon, fab }) => {
+          const active = isActive(href);
+
+          if (fab) {
+            return (
+              <Link
+                key={href}
+                href={href}
+                style={{
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "0.1875rem",
+                  textDecoration: "none",
+                }}
+              >
+                <div
+                  style={{
+                    width: "3rem",
+                    height: "3rem",
+                    borderRadius: "0.875rem",
+                    background: active ? "#8B6914" : "#A67C2E",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    boxShadow: "0 2px 8px rgba(166,124,46,0.35)",
+                    marginTop: "-0.5rem",
+                  }}
+                >
+                  <Icon size={20} strokeWidth={2} color="#fff" />
+                </div>
+                <span
+                  style={{
+                    fontSize: "0.5625rem",
+                    fontFamily: "var(--font-body), system-ui, sans-serif",
+                    letterSpacing: "0.08em",
+                    fontWeight: 600,
+                    color: active ? "#8B6914" : "#A67C2E",
+                    marginTop: "0.125rem",
+                  }}
+                >
+                  {label}
+                </span>
+              </Link>
+            );
+          }
 
           return (
             <Link
               key={href}
               href={href}
-              className={`flex flex-1 flex-col items-center justify-center gap-1 rounded-lg px-1 py-2 text-xs font-medium transition-colors ${
-                isActive
-                  ? "text-zinc-900 dark:text-zinc-50"
-                  : "text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
-              }`}
+              style={{
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "0.25rem",
+                textDecoration: "none",
+                paddingTop: "0.375rem",
+              }}
             >
               <Icon
-                className={`h-6 w-6 ${isActive ? "stroke-[2.5px]" : "stroke-[2px]"}`}
-                aria-hidden
+                size={20}
+                strokeWidth={active ? 2 : 1.5}
+                color={active ? "#1A1A18" : "#9A9490"}
               />
-              <span>{label}</span>
+              <span
+                style={{
+                  fontSize: "0.5625rem",
+                  fontFamily: "var(--font-body), system-ui, sans-serif",
+                  letterSpacing: "0.08em",
+                  fontWeight: active ? 700 : 400,
+                  color: active ? "#1A1A18" : "#9A9490",
+                }}
+              >
+                {label}
+              </span>
+              {active && (
+                <div
+                  style={{
+                    width: "1.25rem",
+                    height: "2px",
+                    borderRadius: "1px",
+                    background: "#1A1A18",
+                    marginTop: "-0.125rem",
+                  }}
+                />
+              )}
             </Link>
           );
         })}

@@ -1,0 +1,522 @@
+/* ── NOW page ── */
+
+.now-page {
+  min-height: 100%;
+  background: #EDE9E1;
+}
+
+/* ── Hero ── */
+
+.now-hero {
+  position: relative;
+  background: #1A2332;
+  overflow: hidden;
+  padding: 1.125rem 1.25rem 1.5rem;
+}
+
+.now-hero::before,
+.now-hero::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.now-hero::before {
+  width: 220px;
+  height: 220px;
+  background: rgba(255,255,255,0.045);
+  top: -60px;
+  right: -50px;
+}
+.now-hero::after {
+  width: 150px;
+  height: 150px;
+  background: rgba(255,255,255,0.03);
+  top: 40px;
+  right: 30px;
+}
+
+.now-masthead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.625rem;
+  position: relative;
+  z-index: 1;
+}
+
+.now-masthead-rule {
+  height: 1px;
+  background: rgba(255,255,255,0.1);
+  margin-bottom: 1.125rem;
+  position: relative;
+  z-index: 1;
+}
+
+.now-brand {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.5625rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  color: rgba(255,255,255,0.4);
+  text-transform: uppercase;
+}
+
+.now-day-counter {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.5625rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.38);
+}
+
+.now-greeting-italic {
+  font-family: var(--font-display), Georgia, serif;
+  font-style: italic;
+  font-size: 1.375rem;
+  font-weight: 400;
+  color: rgba(255,255,255,0.8);
+  line-height: 1.2;
+  margin: 0 0 0.0625rem;
+  position: relative;
+  z-index: 1;
+}
+
+.now-name {
+  font-family: var(--font-condensed), "Barlow Condensed", "Impact", sans-serif;
+  font-size: clamp(3rem, 15vw, 4.25rem);
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  color: #fff;
+  line-height: 0.95;
+  margin: 0 0 0.875rem;
+  position: relative;
+  z-index: 1;
+}
+
+.now-date-line {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.42);
+  text-transform: uppercase;
+  margin-bottom: 1.25rem;
+  position: relative;
+  z-index: 1;
+}
+
+.now-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  position: relative;
+  z-index: 1;
+}
+
+.now-progress-label {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.5rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.28);
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.now-progress-track {
+  flex: 1;
+  height: 2px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.now-progress-fill {
+  height: 100%;
+  background: rgba(255,255,255,0.5);
+  border-radius: 1px;
+}
+
+.now-progress-pct {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.5rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: rgba(255,255,255,0.32);
+  flex-shrink: 0;
+}
+
+/* ── Content area ── */
+
+.now-content {
+  padding: 1.125rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  max-width: 32rem;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.now-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.now-section-label {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #9A9490;
+}
+
+.now-section-meta {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.625rem;
+  color: #A67C2E;
+  font-weight: 500;
+}
+
+/* ── Vitals card ── */
+
+.now-vitals-card {
+  background: #fff;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+}
+
+.now-vital-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5625rem 1rem;
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+}
+
+.now-vital-row:last-child {
+  border-bottom: none;
+}
+
+.now-vital-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.now-vital-name {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #6B6860;
+  width: 3.5rem;
+  flex-shrink: 0;
+}
+
+.now-vital-stat {
+  font-family: var(--font-condensed), "Barlow Condensed", sans-serif;
+  font-size: 0.875rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  flex-shrink: 0;
+  min-width: 2.75rem;
+}
+
+.now-vital-desc {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.5625rem;
+  color: #9A9490;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.now-vital-charts {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  flex-shrink: 0;
+}
+
+.now-trend-bar {
+  width: 26px;
+  height: 2.5px;
+  border-radius: 2px;
+  opacity: 0.55;
+  flex-shrink: 0;
+}
+
+/* ── Wealth card ── */
+
+.now-wealth-card {
+  background: #1B5E3B;
+  border-radius: 1rem;
+  padding: 1.125rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.now-wealth-card::before {
+  content: "";
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+  top: -60px;
+  right: -40px;
+  pointer-events: none;
+}
+
+.now-wealth-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.375rem;
+  position: relative;
+  z-index: 1;
+}
+
+.now-wealth-tag {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+}
+
+.now-wealth-icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  background: rgba(255,255,255,0.1);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.now-wealth-big {
+  font-family: var(--font-condensed), "Barlow Condensed", sans-serif;
+  font-size: clamp(2.5rem, 13vw, 3.75rem);
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  color: #fff;
+  margin-bottom: 0.1875rem;
+  position: relative;
+  z-index: 1;
+}
+
+.now-wealth-sub {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.6875rem;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 0.875rem;
+  position: relative;
+  z-index: 1;
+}
+
+.now-wealth-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.1);
+  margin-bottom: 0.75rem;
+  position: relative;
+  z-index: 1;
+}
+
+.now-wealth-stats {
+  display: flex;
+  gap: 1.25rem;
+  margin-bottom: 0.875rem;
+  position: relative;
+  z-index: 1;
+}
+
+.now-wealth-stat-label {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.4375rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  margin-bottom: 0.1875rem;
+}
+
+.now-wealth-stat-val {
+  font-family: var(--font-condensed), "Barlow Condensed", sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.now-emerg-label {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.4375rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+  margin-bottom: 0.375rem;
+  position: relative;
+  z-index: 1;
+}
+
+.now-emerg-track {
+  height: 3px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+.now-emerg-fill {
+  height: 100%;
+  background: rgba(255,255,255,0.55);
+  border-radius: 2px;
+}
+
+/* ── Quote card ── */
+
+.now-quote-card {
+  background: #fff;
+  border-radius: 1rem;
+  padding: 1rem 1.125rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  border-top: 3px solid #1B5E3B;
+}
+
+.now-quote-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.625rem;
+}
+
+.now-quote-type {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #1B5E3B;
+}
+
+.now-quote-sep {
+  width: 1px;
+  height: 9px;
+  background: #D1CCC4;
+}
+
+.now-quote-time {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.5625rem;
+  color: #9A9490;
+}
+
+.now-quote-text {
+  font-family: var(--font-display), Georgia, serif;
+  font-style: italic;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: #2D9E8C;
+  margin: 0;
+}
+
+/* ── Action buttons ── */
+
+.now-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.now-btn-primary {
+  flex: 1.4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: #1A1A18;
+  color: #fff;
+  border: none;
+  border-radius: 3rem;
+  height: 2.875rem;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  letter-spacing: -0.01em;
+}
+
+.now-btn-secondary {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  background: #E0D9CC;
+  color: #6B6860;
+  border: none;
+  border-radius: 3rem;
+  height: 2.875rem;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* ── Principle card ── */
+
+.now-principle-card {
+  background: #fff;
+  border-radius: 1rem;
+  padding: 1rem 1.125rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  border-left: 3px solid #1A1A18;
+}
+
+.now-principle-label {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.4375rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #9A9490;
+  margin-bottom: 0.5rem;
+}
+
+.now-principle-text {
+  font-family: var(--font-display), Georgia, serif;
+  font-style: italic;
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: #3D3935;
+  margin: 0;
+}
+
+/* ── Loading skeleton ── */
+
+.now-skeleton {
+  background: linear-gradient(90deg, #E0D9CC 0%, #CCC5B8 50%, #E0D9CC 100%);
+  background-size: 200% 100%;
+  animation: now-shimmer 1.4s ease infinite;
+  border-radius: 0.75rem;
+}
+
+@keyframes now-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
