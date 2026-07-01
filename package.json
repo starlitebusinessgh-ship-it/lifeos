@@ -11,7 +11,8 @@
     "db:migrate:finance-budget": "node scripts/apply-migration.mjs supabase/migrations/20260615150000_create_finance_budget.sql",
     "db:seed:finance-entries": "node scripts/apply-migration.mjs supabase/seeds/20260615160000_seed_finance_entries.sql",
     "db:clear:finance": "node scripts/clear-finance-data.mjs",
-    "db:seed:finance-baseline": "node scripts/seed-finance-baseline.mjs"
+    "db:seed:finance-baseline": "node scripts/seed-finance-baseline.mjs",
+    "icons:generate": "node scripts/generate-pwa-icons.mjs"
   },
   "dependencies": {
     "@connectrpc/connect": "^2.1.2",
@@ -19,10 +20,13 @@
     "@cursor/sdk": "^1.0.19",
     "@supabase/supabase-js": "^2.107.0",
     "lucide-react": "^1.18.0",
+    "motion": "^12.40.0",
     "next": "15.5.19",
     "openai": "^6.42.0",
+    "pdfjs-dist": "^6.0.227",
     "react": "18.3.1",
     "react-dom": "18.3.1",
+    "react-pdf": "^9.2.1",
     "recharts": "^3.8.1"
   },
   "devDependencies": {

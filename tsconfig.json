@@ -37,6 +37,10 @@
     "**/*.mts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "figma-ui",
+    "src",
+    "vite.config.ts",
+    "index.html"
   ]
 }
