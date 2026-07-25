@@ -26,16 +26,16 @@ function SwipeRow({
   return (
     <div className="rv-swipe-wrap">
       <div className="rv-swipe-actions">
-        <button type="button" className="edit" aria-label="Edit" onClick={() => onSelect(entry)}>
+        <button type="button" className="edit" aria-label="Edit" onClick={() => { setOffset(0); onSelect(entry); }}>
           <Pencil size={16} />
         </button>
-        <button type="button" className="del" aria-label="Delete" onClick={() => onDelete(entry)}>
+        <button type="button" className="del" aria-label="Delete" onClick={() => { setOffset(0); onDelete(entry); }}>
           <Trash2 size={16} />
         </button>
       </div>
       <button
         type="button"
-        className="rv-txn rv-swipe-content"
+        className={`rv-txn rv-swipe-content${offset < -20 ? " rv-swipe-content--open" : ""}`}
         style={{ transform: `translateX(${offset}px)` }}
         onClick={() => {
           if (offset < -20) {

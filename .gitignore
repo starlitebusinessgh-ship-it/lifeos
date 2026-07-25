@@ -39,3 +39,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# bible offline data (run npm run bible:build)
+/data/bible/
+/public/bible/data/
+/public/bible/manifest.json
+
+.vercel
+.env*
+
+# editor / local tooling
+.claude/

@@ -78,8 +78,18 @@ const FALLBACK: Record<TxnType, CategoryMeta> = {
   Savings: { name: "Savings", type: "Savings", icon: "PiggyBank", color: "#2f6bff" },
 };
 
-export function categoryMeta(name: string, type: TxnType): CategoryMeta {
-  return CATEGORIES.find((c) => c.name === name) ?? FALLBACK[type];
+export function normalizeTxnType(type: string | null | undefined): TxnType {
+  if (type === "Income" || type === "Expense" || type === "Savings") return type;
+  const lower = type?.toLowerCase();
+  if (lower === "income") return "Income";
+  if (lower === "expense") return "Expense";
+  if (lower === "savings") return "Savings";
+  return "Expense";
+}
+
+export function categoryMeta(name: string, type: TxnType | string): CategoryMeta {
+  const t = normalizeTxnType(type);
+  return CATEGORIES.find((c) => c.name === name) ?? FALLBACK[t];
 }
 
 export function categoriesFor(type: TxnType): CategoryMeta[] {

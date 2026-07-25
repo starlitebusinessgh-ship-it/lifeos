@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { BottomSheet } from "@/components/ui/BottomSheet";
 import { X, Trash2 } from "lucide-react";
 import type { EntryDraft, TxnType } from "@/lib/finance/types";
 import { categoriesFor, INTENTS } from "@/lib/finance/types";
@@ -90,24 +90,13 @@ export function AddTransactionSheet({
   }
 
   return (
-    <AnimatePresence>
-      {open && (
-        <>
-          <motion.div
-            className="rv-scrim"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            onClick={onClose}
-          />
-          <motion.div
-            className="rv-sheet"
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "100%" }}
-            transition={{ type: "spring", damping: 32, stiffness: 320 }}
-          >
+    <BottomSheet
+      open={open}
+      onClose={onClose}
+      className="rv-sheet"
+      scrimClassName="rv-scrim"
+      aria-label={isEdit ? "Edit transaction" : "New transaction"}
+    >
             <div className="rv-sheet-grab" />
             <div className="rv-sheet-head">
               <h3>{isEdit ? "Edit transaction" : "New transaction"}</h3>
@@ -226,9 +215,6 @@ export function AddTransactionSheet({
                 {confirmDelete ? "Tap again to delete" : "Delete transaction"}
               </button>
             )}
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+    </BottomSheet>
   );
 }

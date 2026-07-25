@@ -1,9 +1,17 @@
-const CACHE = "lifeos-finance-v1";
+const CACHE = "lifeos-v7";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE).then((cache) =>
-      cache.addAll(["/finance", "/glance", "/manifest.json", "/icons/icon-192.svg"])
+      cache.addAll([
+        "/learn",
+        "/learn/bible",
+        "/today",
+        "/finance",
+        "/manifest.json",
+        "/icons/icon-192.png",
+        "/icons/apple-touch-icon.png",
+      ])
     )
   );
   self.skipWaiting();
@@ -16,6 +24,24 @@ self.addEventListener("activate", (event) => {
     )
   );
   self.clients.claim();
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
+      for (const client of clients) {
+        if ("focus" in client) {
+          client.focus();
+          client.postMessage({ type: "lifeos:alarm-open", data: event.notification.data });
+          return;
+        }
+      }
+      if (self.clients.openWindow) {
+        return self.clients.openWindow("/today");
+      }
+    })
+  );
 });
 
 self.addEventListener("fetch", (event) => {
@@ -32,6 +58,6 @@ self.addEventListener("fetch", (event) => {
         }
         return res;
       })
-      .catch(() => caches.match(event.request).then((r) => r || caches.match("/finance")))
+      .catch(() => caches.match(event.request).then((r) => r || caches.match("/learn")))
   );
 });

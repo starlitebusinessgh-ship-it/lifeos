@@ -1,0 +1,784 @@
+/* ============================================================
+   LifeOS · Shell + Home
+   Warm obsidian cockpit — editorial briefing, not widget grid.
+============================================================ */
+
+.lo-app {
+  --lo-bg: #0a0908;
+  --lo-bg-elevated: #121110;
+  --lo-mesh-a: rgba(255, 140, 66, 0.12);
+  --lo-mesh-b: rgba(120, 108, 255, 0.08);
+  --lo-mesh-c: rgba(22, 199, 154, 0.06);
+  --lo-surface: rgba(255, 248, 240, 0.05);
+  --lo-surface-2: rgba(255, 248, 240, 0.08);
+  --lo-hairline: rgba(255, 248, 240, 0.08);
+  --lo-hairline-2: rgba(255, 248, 240, 0.14);
+  --lo-ink: #faf6f0;
+  --lo-muted: rgba(250, 246, 240, 0.52);
+  --lo-faint: rgba(250, 246, 240, 0.32);
+  --lo-accent: #ff8c42;
+  --lo-accent-soft: rgba(255, 140, 66, 0.18);
+  --lo-finance: #6b72ff;
+  --lo-today: #ff9f5a;
+  --lo-vitality: #2dd4a8;
+  --lo-learn: #c4a1ff;
+  --lo-shell: 480px;
+  --lo-header-h: 52px;
+  --lo-drawer-w: min(320px, 88vw);
+
+  min-height: 100dvh;
+  background: var(--lo-bg);
+  color: var(--lo-ink);
+  position: relative;
+  overflow-x: hidden;
+}
+
+.lo-app::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 90% 60% at 10% -10%, var(--lo-mesh-a), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 95% 15%, var(--lo-mesh-b), transparent 50%),
+    radial-gradient(ellipse 60% 40% at 50% 100%, var(--lo-mesh-c), transparent 45%);
+  z-index: 0;
+  animation: lo-mesh-drift 48s ease-in-out infinite alternate;
+}
+
+@keyframes lo-mesh-drift {
+  0% { opacity: 1; transform: scale(1) translateY(0); }
+  100% { opacity: 0.92; transform: scale(1.04) translateY(-1%); }
+}
+
+/* ---- Time phases ---- */
+.lo-phase-morning {
+  --lo-mesh-a: rgba(255, 180, 90, 0.18);
+  --lo-mesh-b: rgba(255, 120, 60, 0.1);
+  --lo-mesh-c: rgba(255, 220, 150, 0.08);
+  --lo-bg: #0c0a08;
+}
+.lo-phase-afternoon {
+  --lo-mesh-a: rgba(255, 140, 66, 0.12);
+  --lo-mesh-b: rgba(100, 120, 255, 0.1);
+  --lo-mesh-c: rgba(22, 199, 154, 0.06);
+}
+.lo-phase-evening {
+  --lo-mesh-a: rgba(255, 100, 50, 0.14);
+  --lo-mesh-b: rgba(180, 80, 200, 0.08);
+  --lo-mesh-c: rgba(255, 60, 40, 0.05);
+  --lo-bg: #090808;
+}
+.lo-phase-night {
+  --lo-mesh-a: rgba(80, 90, 180, 0.08);
+  --lo-mesh-b: rgba(40, 40, 60, 0.12);
+  --lo-mesh-c: rgba(255, 140, 66, 0.04);
+  --lo-bg: #060608;
+}
+
+/* ---- Tone variants ---- */
+.lo-tone-light,
+.lo-tone-module {
+  background: transparent;
+  min-height: auto;
+}
+.lo-tone-light::before,
+.lo-tone-module::before {
+  display: none;
+}
+.lo-tone-module .lo-shell {
+  min-height: auto;
+}
+
+.lo-finance-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  max-width: var(--lo-shell);
+  margin: 0 auto;
+}
+
+.lo-shell {
+  position: relative;
+  z-index: 1;
+  max-width: var(--lo-shell);
+  margin: 0 auto;
+  min-height: 100dvh;
+  padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
+}
+.lo-shell.lo-has-daily {
+  padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
+}
+
+/* ---- Header ---- */
+.lo-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  height: calc(var(--lo-header-h) + env(safe-area-inset-top));
+  padding: env(safe-area-inset-top) 1rem 0;
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  background: rgba(10, 9, 8, 0.72);
+  border-bottom: 1px solid var(--lo-hairline);
+}
+
+.lo-header-title {
+  flex: 1;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.lo-header-center {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+.lo-header-ambient {
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: var(--lo-faint);
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.lo-header-light {
+  background: rgba(255, 255, 255, 0.82);
+  border-bottom-color: rgba(15, 23, 42, 0.08);
+}
+.lo-header-finance {
+  background: rgba(10, 9, 8, 0.94);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+.lo-header-title-finance {
+  flex: 1;
+  text-align: center;
+  color: #f8fafc;
+}
+.lo-icon-btn-finance {
+  background: rgba(255, 255, 255, 0.1);
+  color: #f8fafc;
+}
+.lo-icon-btn-finance:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+.lo-icon-btn-finance-accent {
+  background: rgba(91, 97, 255, 0.45);
+  color: #fff;
+}
+.lo-tone-module .lo-header-light,
+.lo-finance-nav .lo-header-light {
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+}
+.lo-header-title-light { color: #0f172a; }
+.lo-icon-btn-light {
+  background: rgba(15, 23, 42, 0.06);
+  color: #0f172a;
+}
+.lo-icon-btn-light:hover { background: rgba(15, 23, 42, 0.1); }
+.lo-icon-btn-accent-light {
+  background: rgba(73, 79, 223, 0.12);
+  color: #494fdf;
+}
+
+.lo-icon-btn {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 12px;
+  background: var(--lo-surface);
+  color: var(--lo-ink);
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+.lo-icon-btn:active { transform: scale(0.94); }
+.lo-icon-btn:hover { background: var(--lo-surface-2); }
+
+.lo-icon-btn-accent {
+  background: var(--lo-accent-soft);
+  color: var(--lo-accent);
+}
+
+/* ---- Drawer ---- */
+.lo-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s ease;
+}
+.lo-drawer-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.lo-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 90;
+  width: var(--lo-drawer-w);
+  background: #11100f;
+  border-right: 1px solid var(--lo-hairline);
+  transform: translateX(-105%);
+  transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+  display: flex;
+  flex-direction: column;
+  padding-top: env(safe-area-inset-top);
+  box-shadow: 24px 0 64px rgba(0, 0, 0, 0.45);
+}
+.lo-drawer.open { transform: translateX(0); }
+
+.lo-drawer-head {
+  padding: 1.25rem 1.15rem 0.85rem;
+  border-bottom: 1px solid var(--lo-hairline);
+}
+.lo-drawer-head h2 {
+  font-size: 1.35rem;
+  font-weight: 650;
+  letter-spacing: -0.03em;
+}
+.lo-drawer-head p {
+  font-size: 0.78rem;
+  color: var(--lo-muted);
+  margin-top: 0.2rem;
+}
+
+.lo-drawer-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.65rem 0.75rem 1.5rem;
+}
+
+.lo-drawer-group {
+  margin-bottom: 1.1rem;
+}
+.lo-drawer-group-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--lo-faint);
+  padding: 0.35rem 0.5rem 0.5rem;
+}
+
+.lo-drawer-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.72rem 0.65rem;
+  border-radius: 14px;
+  color: var(--lo-ink);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+.lo-drawer-link:hover { background: var(--lo-surface); }
+.lo-drawer-link.active {
+  background: var(--lo-surface-2);
+  box-shadow: inset 0 0 0 1px var(--lo-hairline-2);
+}
+.lo-drawer-link.disabled {
+  opacity: 0.38;
+  pointer-events: none;
+}
+
+.lo-drawer-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.lo-drawer-link span:last-child { flex: 1; }
+.lo-drawer-soon {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--lo-faint);
+  padding: 0.15rem 0.45rem;
+  border: 1px solid var(--lo-hairline);
+  border-radius: 6px;
+}
+
+/* ---- Home briefing ---- */
+.lo-home {
+  padding: 0.5rem 1.1rem 0;
+}
+
+.lo-hero {
+  padding: 1.35rem 0 1.75rem;
+}
+
+.lo-hero-date {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--lo-muted);
+  margin-bottom: 0.85rem;
+}
+
+.lo-hero-headline {
+  font-size: clamp(2rem, 8vw, 2.65rem);
+  font-weight: 300;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+  color: var(--lo-ink);
+  max-width: 13ch;
+}
+
+.lo-hero-headline strong {
+  font-weight: 600;
+  color: #fff;
+}
+
+.lo-hero-sub {
+  margin-top: 0.85rem;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--lo-muted);
+  max-width: 28ch;
+}
+
+/* ---- Section labels ---- */
+.lo-section {
+  margin-bottom: 1.35rem;
+}
+.lo-section-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--lo-faint);
+  margin-bottom: 0.55rem;
+  padding-left: 0.15rem;
+}
+
+/* ---- Now card (alarm) ---- */
+.lo-now-card {
+  position: relative;
+  overflow: hidden;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  padding: 1.1rem 1.15rem;
+  border-radius: 20px;
+  background: linear-gradient(145deg, rgba(255, 159, 90, 0.14) 0%, var(--lo-surface) 55%);
+  border: 1px solid rgba(255, 159, 90, 0.2);
+  transition: transform 0.15s, border-color 0.15s;
+}
+.lo-now-card:active { transform: scale(0.985); }
+.lo-now-card.empty {
+  background: var(--lo-surface);
+  border-color: var(--lo-hairline);
+}
+.lo-now-urgent {
+  border-color: rgba(255, 120, 60, 0.45);
+  box-shadow: 0 0 40px rgba(255, 120, 60, 0.12);
+}
+.lo-now-glow {
+  position: absolute;
+  inset: -40%;
+  background: radial-gradient(circle, rgba(255, 159, 90, 0.15), transparent 65%);
+  pointer-events: none;
+  animation: lo-now-breathe 4s ease-in-out infinite;
+}
+@keyframes lo-now-breathe {
+  0%, 100% { opacity: 0.5; transform: scale(0.95); }
+  50% { opacity: 1; transform: scale(1); }
+}
+.lo-now-time-sm {
+  font-size: 1.75rem !important;
+  opacity: 0.35;
+}
+
+.lo-now-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.35rem;
+}
+.lo-now-tag {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--lo-today);
+  letter-spacing: 0.04em;
+}
+.lo-now-countdown {
+  font-size: 0.78rem;
+  color: var(--lo-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.lo-now-time {
+  font-size: 2.5rem;
+  font-weight: 200;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.lo-now-label {
+  margin-top: 0.35rem;
+  font-size: 0.88rem;
+  color: var(--lo-muted);
+}
+
+/* ---- Signal rows ---- */
+.lo-signals {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.lo-signal {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.9rem 1rem;
+  border-radius: 16px;
+  background: var(--lo-surface);
+  border: 1px solid var(--lo-hairline);
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.15s, transform 0.1s;
+}
+.lo-signal:active { transform: scale(0.99); }
+.lo-signal:hover { background: var(--lo-surface-2); }
+
+.lo-signal-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.lo-signal-icon.finance { background: rgba(107, 114, 255, 0.18); color: var(--lo-finance); }
+.lo-signal-icon.today { background: rgba(255, 159, 90, 0.18); color: var(--lo-today); }
+.lo-signal-icon.vitality { background: rgba(45, 212, 168, 0.15); color: var(--lo-vitality); }
+
+.lo-signal-body { flex: 1; min-width: 0; }
+.lo-signal-module {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--lo-faint);
+  margin-bottom: 0.12rem;
+}
+.lo-signal-text {
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lo-signal-chevron {
+  color: var(--lo-faint);
+  flex-shrink: 0;
+}
+
+/* ---- Balance strip ---- */
+.lo-balance-strip {
+  display: flex;
+  gap: 0.55rem;
+  margin-bottom: 1.35rem;
+}
+
+.lo-balance-pill {
+  flex: 1;
+  padding: 0.85rem 0.95rem;
+  border-radius: 16px;
+  background: linear-gradient(145deg, rgba(107, 114, 255, 0.16) 0%, var(--lo-surface) 70%);
+  border: 1px solid rgba(107, 114, 255, 0.22);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.1s;
+}
+.lo-balance-pill:active { transform: scale(0.98); }
+
+.lo-balance-pill .k {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lo-faint);
+  margin-bottom: 0.25rem;
+}
+.lo-balance-pill .v {
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.lo-balance-pill .sub {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--lo-muted);
+  margin-top: 0.15rem;
+}
+
+/* ---- Quick modules ---- */
+.lo-quick-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding-top: 0.25rem;
+}
+.lo-quick-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: 999px;
+  background: var(--lo-surface);
+  border: 1px solid var(--lo-hairline);
+  color: var(--lo-ink);
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+.lo-quick-chip:hover { background: var(--lo-surface-2); }
+.lo-quick-chip .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+/* ---- Skeleton ---- */
+.lo-skel-hero {
+  height: 5.5rem;
+  border-radius: 12px;
+  background: linear-gradient(90deg, var(--lo-surface) 25%, var(--lo-surface-2) 50%, var(--lo-surface) 75%);
+  background-size: 200% 100%;
+  animation: lo-shimmer 1.2s infinite;
+  margin-bottom: 1.5rem;
+}
+.lo-skel-card {
+  height: 5.5rem;
+  border-radius: 20px;
+  background: linear-gradient(90deg, var(--lo-surface) 25%, var(--lo-surface-2) 50%, var(--lo-surface) 75%);
+  background-size: 200% 100%;
+  animation: lo-shimmer 1.2s infinite;
+  margin-bottom: 0.5rem;
+}
+@keyframes lo-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ---- Stub sheet ---- */
+.lo-stub-toast {
+  position: fixed;
+  bottom: calc(5.75rem + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%) translateY(120%);
+  z-index: 100;
+  padding: 0.75rem 1.1rem;
+  border-radius: 14px;
+  background: rgba(30, 28, 26, 0.95);
+  border: 1px solid var(--lo-hairline-2);
+  font-size: 0.85rem;
+  color: var(--lo-muted);
+  backdrop-filter: blur(16px);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  max-width: calc(var(--lo-shell) - 2rem);
+  text-align: center;
+}
+.lo-stub-toast.show {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ---- Daily bar ---- */
+.lo-daily-bar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  width: 100%;
+  max-width: var(--lo-shell);
+  display: flex;
+  align-items: stretch;
+  justify-content: space-around;
+  padding: 0.35rem 0.5rem calc(0.45rem + env(safe-area-inset-bottom));
+  background: rgba(12, 11, 10, 0.88);
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  border-top: 1px solid var(--lo-hairline);
+}
+
+.lo-daily-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.35rem 0.5rem;
+  min-width: 3.5rem;
+  border: none;
+  background: none;
+  color: var(--lo-faint);
+  text-decoration: none;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.lo-daily-tab.active { color: var(--lo-accent); }
+.lo-daily-tab:active { opacity: 0.7; }
+.lo-daily-search { color: var(--lo-muted); }
+
+.lo-daily-bar--light {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(24px) saturate(1.8);
+  -webkit-backdrop-filter: blur(24px) saturate(1.8);
+  border-top: 1px solid rgba(60, 60, 67, 0.12);
+}
+
+.lo-daily-bar--light .lo-daily-tab {
+  color: #8e8e93;
+}
+
+.lo-daily-bar--light .lo-daily-tab.active {
+  color: var(--ln-accent, #5856d6);
+}
+
+.lo-daily-bar--light .lo-daily-search {
+  color: #636366;
+}
+
+.lo-header-learn {
+  background: rgba(250, 250, 250, 0.94);
+  border-bottom-color: rgba(60, 60, 67, 0.1);
+}
+
+.lo-app--learn.lo-tone-module {
+  background: #fafafa;
+  color: #000000;
+}
+
+/* ---- Search palette ---- */
+.lo-palette-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: max(12vh, 4rem) 1rem 1rem;
+  animation: lo-fade-in 0.2s ease;
+}
+@keyframes lo-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.lo-palette {
+  width: 100%;
+  max-width: 400px;
+  background: #161514;
+  border: 1px solid var(--lo-hairline-2);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+  animation: lo-palette-up 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+}
+@keyframes lo-palette-up {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.lo-palette-head {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.85rem 0.85rem 0.85rem 1rem;
+  border-bottom: 1px solid var(--lo-hairline);
+}
+.lo-palette-icon { color: var(--lo-faint); flex-shrink: 0; }
+.lo-palette-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--lo-ink);
+  font-size: 1rem;
+  outline: none;
+}
+.lo-palette-input::placeholder { color: var(--lo-faint); }
+
+.lo-palette-hint {
+  padding: 0.55rem 1rem;
+  font-size: 0.72rem;
+  color: var(--lo-faint);
+  border-bottom: 1px solid var(--lo-hairline);
+}
+
+.lo-palette-list {
+  list-style: none;
+  padding: 0.4rem;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+.lo-palette-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.72rem 0.85rem;
+  border-radius: 12px;
+  color: var(--lo-ink);
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 500;
+  transition: background 0.12s;
+}
+.lo-palette-item:hover { background: var(--lo-surface); }
+
+/* ---- Home sync + refresh ---- */
+.lo-sync-pulse {
+  position: fixed;
+  top: calc(var(--lo-header-h) + env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%) scaleX(0);
+  width: 48px;
+  height: 3px;
+  border-radius: 99px;
+  background: var(--lo-accent);
+  z-index: 50;
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.lo-sync-pulse.show {
+  opacity: 1;
+  transform: translateX(-50%) scaleX(1);
+}
+
+.lo-refresh-hint {
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--lo-muted);
+  padding: 0.5rem;
+}

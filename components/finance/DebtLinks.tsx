@@ -11,14 +11,20 @@ export function DebtPaymentHistory({ debtId }: { debtId: number }) {
   const [payments, setPayments] = useState<FinanceEntry[]>([]);
 
   useEffect(() => {
-    void supabase
-      .from("finance_entries")
-      .select(ENTRY_SELECT)
-      .eq("debt_id", debtId)
-      .order("date", { ascending: false })
-      .then(({ data }) => {
-        if (data) setPayments(data as FinanceEntry[]);
-      });
+    function load() {
+      void supabase
+        .from("finance_entries")
+        .select(ENTRY_SELECT)
+        .eq("debt_id", debtId)
+        .order("date", { ascending: false })
+        .then(({ data }) => {
+          if (data) setPayments(data as FinanceEntry[]);
+        });
+    }
+
+    load();
+    window.addEventListener("lifeos:finance-changed", load);
+    return () => window.removeEventListener("lifeos:finance-changed", load);
   }, [debtId]);
 
   if (payments.length === 0) return null;

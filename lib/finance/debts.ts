@@ -84,5 +84,13 @@ export function useDebts() {
     void reload();
   }, [reload]);
 
+  useEffect(() => {
+    const onChange = () => {
+      void reload();
+    };
+    window.addEventListener("lifeos:finance-changed", onChange);
+    return () => window.removeEventListener("lifeos:finance-changed", onChange);
+  }, [reload]);
+
   return { debts, loading, reload };
 }

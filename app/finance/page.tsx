@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { Search, Bell, Plus } from "lucide-react";
 import type { EntryDraft, FinanceEntry, TxnType } from "@/lib/finance/types";
 import {
@@ -21,7 +22,10 @@ import { haptic } from "@/lib/finance/haptics";
 import { BalanceCard } from "@/components/finance/BalanceCard";
 import { AccountsStrip } from "@/components/finance/AccountsStrip";
 import { QuickActions } from "@/components/finance/QuickActions";
-import { SpendingDonut } from "@/components/finance/SpendingDonut";
+const SpendingDonut = dynamic(
+  () => import("@/components/finance/SpendingDonut").then((m) => m.SpendingDonut),
+  { ssr: false }
+);
 import { TransactionList } from "@/components/finance/TransactionList";
 import { AddTransactionSheet } from "@/components/finance/AddTransactionSheet";
 import { SearchOverlay } from "@/components/finance/SearchOverlay";
@@ -30,14 +34,13 @@ import { FirstRunHint } from "@/components/finance/FirstRunHint";
 import { MonthPicker } from "@/components/finance/MonthPicker";
 import { PullToRefresh } from "@/components/finance/PullToRefresh";
 import { SkeletonHome } from "@/components/finance/Skeleton";
-import { useToast } from "@/components/finance/ToastProvider";
-import { supabase } from "@/lib/supabase";
+import { useFinanceDelete } from "@/lib/finance/useFinanceDelete";
 
 const RECENT_LIMIT = 12;
 
 export default function FinancePage() {
-  const { entries, loading, reload, saveEntry, deleteEntry } = useEntries();
-  const { showToast } = useToast();
+  const { entries, loading, reload, saveEntry } = useEntries();
+  const { removeById, removeEntry } = useFinanceDelete();
   const [month, setMonth] = useState(readStoredMonth);
   const [showAll, setShowAll] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -98,47 +101,12 @@ export default function FinancePage() {
 
   async function handleDelete(id: number) {
     setSaving(true);
-    const removed = await deleteEntry(id);
+    await removeById(id, () => setSheetOpen(false));
     setSaving(false);
-    if (removed) {
-      haptic("warning");
-      setSheetOpen(false);
-      showToast("Transaction deleted", {
-        label: "Undo",
-        onClick: () => {
-          void supabase.from("finance_entries").insert({
-            date: removed.date,
-            description: removed.description,
-            category: removed.category,
-            type: removed.type,
-            intent: removed.intent,
-            amount: removed.amount,
-            debt_id: removed.debt_id,
-          }).then(() => reload());
-        },
-      });
-    }
   }
 
   async function handleSwipeDelete(entry: FinanceEntry) {
-    const removed = await deleteEntry(entry.id);
-    if (removed) {
-      haptic("warning");
-      showToast("Transaction deleted", {
-        label: "Undo",
-        onClick: () => {
-          void supabase.from("finance_entries").insert({
-            date: removed.date,
-            description: removed.description,
-            category: removed.category,
-            type: removed.type,
-            intent: removed.intent,
-            amount: removed.amount,
-            debt_id: removed.debt_id,
-          }).then(() => reload());
-        },
-      });
-    }
+    await removeEntry(entry);
   }
 
   return (
@@ -207,6 +175,7 @@ export default function FinancePage() {
             setSearchOpen(false);
             openEdit(e);
           }}
+          onDelete={handleSwipeDelete}
         />
       </div>
     </PullToRefresh>

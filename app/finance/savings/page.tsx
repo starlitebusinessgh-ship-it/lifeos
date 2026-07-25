@@ -3,21 +3,20 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { X, Plus, Target } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { useFinanceDelete } from "@/lib/finance/useFinanceDelete";
 import { useEntries } from "@/lib/finance/useEntries";
-import type { EntryDraft } from "@/lib/finance/types";
+import type { EntryDraft, FinanceEntry } from "@/lib/finance/types";
 import { savingsTotal, groupByDay, formatMoney } from "@/lib/finance/logic";
 import { useSavingsGoal, monthsUntil } from "@/lib/finance/useSavingsGoal";
 import { TransactionList } from "@/components/finance/TransactionList";
 import { AddTransactionSheet } from "@/components/finance/AddTransactionSheet";
 import { PullToRefresh } from "@/components/finance/PullToRefresh";
 import { SkeletonScreen } from "@/components/finance/Skeleton";
-import { useToast } from "@/components/finance/ToastProvider";
 import { haptic } from "@/lib/finance/haptics";
 
 export default function SavingsPage() {
-  const { entries, loading, reload, saveEntry, deleteEntry } = useEntries();
-  const { showToast } = useToast();
+  const { entries, loading, reload, saveEntry } = useEntries();
+  const { removeById, removeEntry } = useFinanceDelete();
   const { goal, loading: goalLoading, save: saveGoalToDb } = useSavingsGoal();
   const [goalOpen, setGoalOpen] = useState(false);
   const [goalDraft, setGoalDraft] = useState("");
@@ -61,26 +60,15 @@ export default function SavingsPage() {
 
   async function handleDelete(id: number) {
     setSaving(true);
-    const removed = await deleteEntry(id);
-    setSaving(false);
-    if (removed) {
+    await removeById(id, () => {
       setAddOpen(false);
       setEditEntry(null);
-      showToast("Transfer deleted", {
-        label: "Undo",
-        onClick: () => {
-          void supabase.from("finance_entries").insert({
-            date: removed.date,
-            description: removed.description,
-            category: removed.category,
-            type: removed.type,
-            intent: removed.intent,
-            amount: removed.amount,
-            debt_id: removed.debt_id,
-          }).then(() => reload());
-        },
-      });
-    }
+    });
+    setSaving(false);
+  }
+
+  async function handleSwipeDelete(entry: FinanceEntry) {
+    await removeEntry(entry);
   }
 
   if ((loading || goalLoading) && entries.length === 0) {
@@ -96,7 +84,7 @@ export default function SavingsPage() {
       <div className="rv-shell">
         <div className="rv-screen-head">
           <h1>Savings</h1>
-          <p>Money set aside — still part of your total balance</p>
+          <p>Money set aside inside your total balance</p>
         </div>
 
         <div className="rv-goal-card">
@@ -158,6 +146,7 @@ export default function SavingsPage() {
           }}
           emptyAction={{ label: "Add to savings", onClick: openAdd }}
           emptyHint="Move money to your savings pocket to track progress."
+          onDelete={handleSwipeDelete}
         />
 
         <AddTransactionSheet

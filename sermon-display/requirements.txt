@@ -1,0 +1,9 @@
+requests>=2.31.0
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+websockets>=13.0
+
+# Phase 3 — live transcription test (transcribe_test.py)
+faster-whisper>=1.1.0
+sounddevice>=0.5.0
+numpy>=1.26.0

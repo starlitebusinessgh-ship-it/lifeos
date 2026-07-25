@@ -1,0 +1,274 @@
+/* ============================================================
+   LifeOS · Home v3 — light briefing canvas
+   Calm, finance-forward, attention-only. No module previews.
+============================================================ */
+
+.hm-root {
+  font-family: var(--font-ui), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+/* Light immersive shell */
+.lo-app.lo-home-light {
+  --lo-bg: #f4f5f9;
+  background: var(--lo-bg);
+  color: #0f172a;
+}
+
+.lo-app.lo-home-light::before {
+  display: block;
+  background:
+    radial-gradient(ellipse 100% 70% at 50% -20%, rgba(73, 79, 223, 0.1), transparent 55%),
+    radial-gradient(ellipse 80% 50% at 100% 30%, rgba(22, 199, 154, 0.07), transparent 50%),
+    radial-gradient(ellipse 60% 40% at 0% 80%, rgba(139, 92, 246, 0.06), transparent 45%),
+    var(--lo-bg);
+  animation: none;
+  opacity: 1;
+}
+
+.lo-app.lo-home-light::after {
+  display: none;
+}
+
+.lo-home-light .lo-daily-bar {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 12px 40px rgba(15, 23, 42, 0.1);
+}
+
+.lo-home-light .lo-daily-tab {
+  color: #94a3b8;
+}
+.lo-home-light .lo-daily-tab.active {
+  color: #494fdf;
+}
+.lo-home-light .lo-daily-search {
+  color: #64748b;
+}
+
+.lo-home-light .lo-stub-toast {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: rgba(15, 23, 42, 0.1);
+  color: #64748b;
+  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.12);
+}
+
+.hm-page {
+  position: relative;
+  z-index: 1;
+  padding: 0 1.15rem 1.5rem;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.hm-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0 1.25rem;
+}
+
+.hm-nav-btn {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #0f172a;
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
+  transition: transform 0.12s;
+}
+.hm-nav-btn:active { transform: scale(0.96); }
+.hm-nav-btn-accent {
+  background: rgba(73, 79, 223, 0.1);
+  border-color: rgba(73, 79, 223, 0.2);
+  color: #494fdf;
+}
+
+.hm-brand {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.hm-hero {
+  margin-bottom: 1.75rem;
+}
+
+.hm-date {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  margin-bottom: 0.65rem;
+}
+
+.hm-headline {
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
+  font-size: clamp(2rem, 7.5vw, 2.5rem);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  color: #0f172a;
+  margin-bottom: 0.55rem;
+}
+
+.hm-subline {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: #64748b;
+  max-width: 32ch;
+}
+
+.hm-finance-block {
+  margin-bottom: 1.5rem;
+}
+
+.hm-finance-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 22px;
+  transition: transform 0.15s;
+}
+.hm-finance-link:active { transform: scale(0.985); }
+.hm-finance-link .rv-master-card { margin-bottom: 0; }
+
+.hm-month-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+  padding: 0 0.15rem;
+}
+
+.hm-month-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.hm-month-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.hm-month-value.pos { color: #059669; }
+.hm-month-value.neg { color: #e11d48; }
+
+.hm-month-link {
+  margin-left: auto;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #494fdf;
+  text-decoration: none;
+}
+
+.hm-attention-block { margin-bottom: 1rem; }
+
+.hm-section-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  margin-bottom: 0.55rem;
+}
+
+.hm-attention-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.hm-attention {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.95rem 1rem;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.12s;
+}
+.hm-attention:active { transform: scale(0.99); }
+.hm-attention-urgent {
+  background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+  border-color: rgba(225, 29, 72, 0.15);
+}
+.hm-attention-urgent .hm-attention-icon { color: #e11d48; }
+.hm-attention-icon { flex-shrink: 0; color: #494fdf; }
+.hm-attention-text {
+  flex: 1;
+  font-size: 0.88rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: #0f172a;
+}
+.hm-attention-arrow { flex-shrink: 0; color: #cbd5e1; }
+
+.hm-sync {
+  position: fixed;
+  top: env(safe-area-inset-top);
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #494fdf, transparent);
+  z-index: 100;
+  transform: scaleX(0);
+  opacity: 0;
+  transition: transform 0.35s ease, opacity 0.2s;
+}
+.hm-sync.show { transform: scaleX(1); opacity: 1; }
+
+.hm-skel-line {
+  border-radius: 8px;
+  background: linear-gradient(90deg, #e8ebf2 25%, #f0f2f7 50%, #e8ebf2 75%);
+  background-size: 200% 100%;
+  animation: hm-shimmer 1.3s infinite;
+  margin-bottom: 0.65rem;
+}
+.hm-skel-date { height: 0.85rem; width: 45%; }
+.hm-skel-headline { height: 2.25rem; width: 70%; margin-bottom: 0.5rem; }
+.hm-skel-sub { height: 1rem; width: 85%; margin-bottom: 1.75rem; }
+.hm-skel-card {
+  height: 200px;
+  border-radius: 22px;
+  background: linear-gradient(90deg, #e8ebf2 25%, #f0f2f7 50%, #e8ebf2 75%);
+  background-size: 200% 100%;
+  animation: hm-shimmer 1.3s infinite;
+}
+@keyframes hm-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.lo-home-light .lo-shell.lo-has-daily {
+  padding-bottom: calc(6rem + env(safe-area-inset-bottom));
+}
+.lo-home-light .lo-stub-toast {
+  bottom: calc(6.5rem + env(safe-area-inset-bottom));
+}
+
+.lo-home-light .lo-daily-bar {
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 2rem);
+  max-width: 420px;
+  bottom: calc(0.65rem + env(safe-area-inset-bottom));
+  border-radius: 22px;
+}

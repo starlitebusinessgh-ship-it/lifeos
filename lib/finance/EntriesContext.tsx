@@ -13,6 +13,16 @@ import { supabase } from "@/lib/supabase";
 import { ENTRY_SELECT } from "./entrySelect";
 import { readEntriesCache, writeEntriesCache } from "./entriesCache";
 import type { EntryDraft, FinanceEntry } from "./types";
+import { normalizeTxnType } from "./types";
+import { applyDebtForEntry, notifyFinanceChanged, reverseDebtForEntry } from "./debtEntrySync";
+
+function normalizeEntry(row: FinanceEntry): FinanceEntry {
+  return {
+    ...row,
+    type: normalizeTxnType(row.type),
+    amount: Math.abs(Number(row.amount)) || 0,
+  };
+}
 
 interface EntriesContextValue {
   entries: FinanceEntry[];
@@ -22,6 +32,7 @@ interface EntriesContextValue {
   reload: () => Promise<void>;
   saveEntry: (draft: EntryDraft) => Promise<FinanceEntry | null>;
   deleteEntry: (id: number) => Promise<FinanceEntry | null>;
+  restoreEntry: (entry: FinanceEntry) => Promise<FinanceEntry | null>;
   clearError: () => void;
 }
 
@@ -43,8 +54,8 @@ export function EntriesProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null);
 
   const applyEntries = useCallback((next: FinanceEntry[]) => {
-    setEntries(next);
-    writeEntriesCache(next);
+    setEntries(next.map(normalizeEntry));
+    writeEntriesCache(next.map(normalizeEntry));
   }, []);
 
   const reload = useCallback(async () => {
@@ -60,7 +71,7 @@ export function EntriesProvider({ children }: { children: ReactNode }) {
     if (err) {
       setError("Couldn't load transactions. Tap to retry.");
     } else if (data) {
-      applyEntries(data as FinanceEntry[]);
+      applyEntries((data as FinanceEntry[]).map(normalizeEntry));
     }
     setLoading(false);
     setSyncing(false);
@@ -69,10 +80,18 @@ export function EntriesProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const cached = readEntriesCache();
     if (cached?.length) {
-      setEntries(cached);
+      setEntries(cached.map(normalizeEntry));
       setLoading(false);
     }
     void reload();
+  }, [reload]);
+
+  useEffect(() => {
+    const onChange = () => {
+      void reload();
+    };
+    window.addEventListener("lifeos:finance-changed", onChange);
+    return () => window.removeEventListener("lifeos:finance-changed", onChange);
   }, [reload]);
 
   const saveEntry = useCallback(async (draft: EntryDraft): Promise<FinanceEntry | null> => {
@@ -81,9 +100,9 @@ export function EntriesProvider({ children }: { children: ReactNode }) {
       date: draft.date || todayISO(),
       description: draft.description,
       category: draft.category,
-      type: draft.type,
+      type: normalizeTxnType(draft.type),
       intent: draft.intent,
-      amount: draft.amount,
+      amount: Math.abs(draft.amount),
     };
 
     if (typeof draft.id === "number" && draft.id > 0) {
@@ -119,12 +138,13 @@ export function EntriesProvider({ children }: { children: ReactNode }) {
         setError("Couldn't save changes. Tap to retry.");
         return null;
       }
-      const saved = data as FinanceEntry;
+      const saved = normalizeEntry(data as FinanceEntry);
       setEntries((cur) => {
         const next = cur.map((e) => (e.id === saved.id ? saved : e));
         writeEntriesCache(next);
         return next;
       });
+      notifyFinanceChanged();
       return saved;
     }
 
@@ -156,12 +176,13 @@ export function EntriesProvider({ children }: { children: ReactNode }) {
       setError("Couldn't add transaction. Tap to retry.");
       return null;
     }
-    const saved = data as FinanceEntry;
+    const saved = normalizeEntry(data as FinanceEntry);
     setEntries((cur) => {
       const next = [saved, ...cur.filter((e) => e.id !== temp)];
       writeEntriesCache(next);
       return next;
     });
+    notifyFinanceChanged();
     return saved;
   }, []);
 
@@ -187,7 +208,45 @@ export function EntriesProvider({ children }: { children: ReactNode }) {
       setError("Couldn't delete. Tap to retry.");
       return null;
     }
-    return removed;
+
+    await reverseDebtForEntry(removed);
+    notifyFinanceChanged();
+    return normalizeEntry(removed);
+  }, []);
+
+  const restoreEntry = useCallback(async (entry: FinanceEntry): Promise<FinanceEntry | null> => {
+    setError(null);
+    const payload = {
+      date: entry.date,
+      description: entry.description,
+      category: entry.category,
+      type: normalizeTxnType(entry.type),
+      intent: entry.intent,
+      amount: Math.abs(Number(entry.amount)) || 0,
+      debt_id: entry.debt_id,
+    };
+
+    const { data, error: err } = await supabase
+      .from("finance_entries")
+      .insert(payload)
+      .select(ENTRY_SELECT)
+      .single();
+
+    if (err || !data) {
+      setError("Couldn't restore transaction.");
+      return null;
+    }
+
+    const saved = normalizeEntry(data as FinanceEntry);
+    await applyDebtForEntry(saved);
+
+    setEntries((cur) => {
+      const next = [saved, ...cur.filter((e) => e.id !== saved.id)];
+      writeEntriesCache(next);
+      return next;
+    });
+    notifyFinanceChanged();
+    return saved;
   }, []);
 
   const value = useMemo(
@@ -199,9 +258,10 @@ export function EntriesProvider({ children }: { children: ReactNode }) {
       reload,
       saveEntry,
       deleteEntry,
+      restoreEntry,
       clearError: () => setError(null),
     }),
-    [entries, loading, syncing, error, reload, saveEntry, deleteEntry]
+    [entries, loading, syncing, error, reload, saveEntry, deleteEntry, restoreEntry]
   );
 
   return <EntriesContext.Provider value={value}>{children}</EntriesContext.Provider>;

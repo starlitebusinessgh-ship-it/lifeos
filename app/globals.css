@@ -413,7 +413,15 @@ a.rv-action-btn { text-decoration: none; }
 .rv-txn-body { flex: 1; min-width: 0; }
 .rv-txn-title { font-size: 0.92rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .rv-txn-sub { font-size: 0.78rem; color: var(--rv-muted); margin-top: 0.1rem; }
-.rv-txn-amt { font-size: 0.95rem; font-weight: 600; white-space: nowrap; letter-spacing: -0.01em; }
+.rv-txn-amt {
+  font-size: 0.95rem;
+  font-weight: 600;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+  flex-shrink: 0;
+  min-width: 4.5rem;
+  text-align: right;
+}
 .rv-txn-amt.in { color: var(--rv-pos); }
 
 .rv-empty {
@@ -467,18 +475,23 @@ a.rv-action-btn { text-decoration: none; }
 }
 .rv-sheet {
   position: fixed;
-  left: 50%;
-  bottom: 0;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  bottom: var(--sheet-keyboard-inset, 0px);
   z-index: 70;
   width: 100%;
   max-width: var(--rv-shell);
+  box-sizing: border-box;
   background: var(--rv-bg-2);
   border-top-left-radius: 24px;
   border-top-right-radius: 24px;
   padding: 0.7rem 1.2rem calc(1.4rem + env(safe-area-inset-bottom));
-  max-height: 92dvh;
+  max-height: min(92dvh, calc(100dvh - env(safe-area-inset-top) - 0.5rem - var(--sheet-keyboard-inset, 0px)));
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   box-shadow: 0 -8px 40px rgba(15, 23, 42, 0.12);
 }
 .rv-sheet-grab { width: 36px; height: 4px; border-radius: 100px; background: var(--rv-surface-3); margin: 0.4rem auto 1.1rem; }
@@ -526,11 +539,12 @@ a.rv-action-btn { text-decoration: none; }
 .rv-field-label { font-size: 0.74rem; color: var(--rv-muted); font-weight: 600; margin-bottom: 0.5rem; display: block; }
 .rv-input {
   width: 100%;
+  box-sizing: border-box;
   background: var(--rv-surface);
   border: 1px solid transparent;
   border-radius: var(--rv-r-input);
   padding: 0.85rem 0.95rem;
-  font-size: 0.95rem;
+  font-size: 16px;
   outline: none;
   transition: border-color 0.18s ease;
 }
@@ -1172,6 +1186,15 @@ a.rv-action-btn { text-decoration: none; }
 .rv-pwa-hint strong { display: block; font-size: 0.88rem; margin-bottom: 0.15rem; }
 .rv-pwa-hint p { opacity: 0.85; line-height: 1.4; margin: 0; }
 .rv-pwa-hint > button { opacity: 0.7; flex-shrink: 0; padding: 0.2rem; }
+.rv-pwa-hint__install {
+  margin-top: 0.55rem;
+  padding: 0.45rem 0.85rem;
+  background: #fff;
+  color: var(--rv-ink);
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
 
 /* ---- Glance (widget-like shortcut page) ---- */
 .rv-glance {
@@ -1403,6 +1426,7 @@ a.rv-action-btn { text-decoration: none; }
 .rv-swipe-wrap {
   position: relative;
   overflow: hidden;
+  border-radius: 12px;
 }
 .rv-swipe-actions {
   position: absolute;
@@ -1411,16 +1435,27 @@ a.rv-action-btn { text-decoration: none; }
   bottom: 0;
   display: flex;
   align-items: stretch;
+  z-index: 0;
 }
 .rv-swipe-actions button {
   width: 54px;
   display: grid;
   place-items: center;
   color: #fff;
+  border: none;
 }
 .rv-swipe-actions .edit { background: var(--rv-primary); }
 .rv-swipe-actions .del { background: var(--rv-neg); }
-.rv-swipe-content { width: 100%; transition: transform 0.15s ease; }
+.rv-swipe-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  transition: transform 0.15s ease;
+  background: var(--rv-surface);
+}
+.rv-swipe-content--open .rv-txn-amt {
+  opacity: 0;
+}
 
 /* ---- More page ---- */
 .rv-more-list {
@@ -1489,4 +1524,39 @@ a.rv-action-btn { text-decoration: none; }
   padding-top: 0.35rem;
 }
 .rv-tab span { font-size: 0.62rem; }
+
+/* ---- LifeOS module switcher ---- */
+.rv-module-bar-wrap,
+.rv-topbar-module {
+  max-width: var(--rv-shell);
+  margin: 0 auto;
+  padding: calc(env(safe-area-inset-top) + 0.55rem) 1rem 0.35rem;
+}
+.rv-module-switch {
+  display: flex;
+  gap: 0.35rem;
+  padding: 0.28rem;
+  background: var(--rv-surface-2);
+  border-radius: var(--rv-r-pill);
+  border: 1px solid var(--rv-hairline);
+}
+.rv-module-pill {
+  flex: 1;
+  text-align: center;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--rv-r-pill);
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--rv-muted);
+  min-height: 40px;
+  display: grid;
+  place-items: center;
+}
+.rv-module-pill.active {
+  background: var(--rv-surface);
+  color: var(--rv-ink);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+}
+
+.rv-finance-chrome { padding-bottom: 0 !important; min-height: auto !important; }
 

@@ -1,8 +1,9 @@
 {
-  "name": "LifeOS Finance",
-  "short_name": "Finance",
-  "description": "Personal finance — balance, budgets, debts & savings",
-  "start_url": "/finance",
+  "id": "/",
+  "name": "LifeOS",
+  "short_name": "LifeOS",
+  "description": "Your life in one place — Bible, learning, finance, and more",
+  "start_url": "/learn",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
@@ -22,6 +23,12 @@
       "purpose": "any"
     },
     {
+      "src": "/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
       "src": "/icons/icon-maskable.svg",
       "sizes": "512x512",
       "type": "image/svg+xml",
@@ -30,20 +37,33 @@
   ],
   "shortcuts": [
     {
-      "name": "Balance glance",
-      "short_name": "Glance",
-      "url": "/glance",
-      "description": "Quick balance & due debts"
+      "name": "Learn",
+      "short_name": "Learn",
+      "url": "/learn",
+      "description": "Bible, books & reading"
+    },
+    {
+      "name": "Bible",
+      "short_name": "Bible",
+      "url": "/learn/bible",
+      "description": "Read & study scripture"
+    },
+    {
+      "name": "Today",
+      "short_name": "Today",
+      "url": "/today",
+      "description": "Alarms & your day"
+    },
+    {
+      "name": "Finance",
+      "short_name": "Finance",
+      "url": "/finance",
+      "description": "Balance, budgets & debts"
     },
     {
       "name": "Add expense",
       "url": "/finance?add=expense",
       "description": "Log spending"
-    },
-    {
-      "name": "Debts",
-      "url": "/finance/debts",
-      "description": "View debts"
     }
   ]
 }

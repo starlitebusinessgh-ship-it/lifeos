@@ -1,4 +1,5 @@
 import type { FinanceEntry } from "./types";
+import { normalizeTxnType } from "./types";
 
 export const CURRENCY = "GH₵";
 
@@ -20,12 +21,14 @@ export function splitMoney(amount: number): { whole: string; cents: string } {
   return { whole: `${amount < 0 ? "-" : ""}${CURRENCY}${grouped}`, cents: `.${cents}` };
 }
 
-/** Running bank balance = income - expense - savings across ALL entries. */
+/** Running total balance = income minus spending. Savings transfers stay inside your total — they move money to the savings pocket. */
 export function computeBalance(entries: FinanceEntry[]): number {
   return entries.reduce((acc, e) => {
     const amt = Math.abs(Number(e.amount));
-    if (e.type === "Income") return acc + amt;
-    return acc - amt; // Expense + Savings both leave the main account
+    const type = normalizeTxnType(e.type);
+    if (type === "Income") return acc + amt;
+    if (type === "Expense") return acc - amt;
+    return acc;
   }, 0);
 }
 
@@ -62,7 +65,7 @@ export function monthSummary(entries: FinanceEntry[], ref = new Date()): MonthSu
     else if (e.type === "Expense") expense += amt;
     else savings += amt;
   }
-  return { income, expense, savings, net: income - expense - savings };
+  return { income, expense, savings, net: income - expense };
 }
 
 export interface CategorySlice {
@@ -116,7 +119,7 @@ export function monthlySeries(entries: FinanceEntry[], count = 6, ref = new Date
       income,
       expense,
       savings,
-      net: income - expense - savings,
+      net: income - expense,
     });
   }
   return points;
@@ -148,7 +151,7 @@ export function spentByCategoryMap(entries: FinanceEntry[], ref = new Date()): M
   const m = ref.getMonth();
   const map = new Map<string, number>();
   for (const e of entries) {
-    if (!inMonth(e.date, y, m)) continue;
+    if (e.type !== "Expense" || !inMonth(e.date, y, m)) continue;
     map.set(e.category, (map.get(e.category) ?? 0) + Math.abs(Number(e.amount)));
   }
   return map;

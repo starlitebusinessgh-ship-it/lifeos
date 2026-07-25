@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import type { Debt } from "./debts";
 import { remaining } from "./debts";
+import { notifyFinanceChanged } from "./debtEntrySync";
 
 function todayISO() {
   const d = new Date();
@@ -51,6 +52,7 @@ export async function payDebt(
     if (error) throw error;
 
     await supabase.from("finance_debts").update({ paid: newPaid }).eq("id", debt.id);
+    notifyFinanceChanged();
     return { entryId: data?.id as number, newPaid, settled };
   }
 
@@ -71,5 +73,6 @@ export async function payDebt(
   if (error) throw error;
 
   await supabase.from("finance_debts").update({ paid: newPaid }).eq("id", debt.id);
+  notifyFinanceChanged();
   return { entryId: data?.id as number, newPaid, settled };
 }

@@ -15,11 +15,13 @@ export function SearchOverlay({
   entries,
   onClose,
   onSelect,
+  onDelete,
 }: {
   open: boolean;
   entries: FinanceEntry[];
   onClose: () => void;
   onSelect: (entry: FinanceEntry) => void;
+  onDelete?: (entry: FinanceEntry) => void;
 }) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("All");
@@ -74,7 +76,7 @@ export function SearchOverlay({
           </div>
 
           <div className="rv-search-results">
-            <TransactionList groups={groups} onSelect={onSelect} />
+            <TransactionList groups={groups} onSelect={onSelect} onDelete={onDelete} />
           </div>
         </motion.div>
       )}
