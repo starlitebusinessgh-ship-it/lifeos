@@ -36,13 +36,13 @@ export default function TodayPage() {
     await Promise.all([reload(), reloadAlarms()]);
   }
 
-  function openNewTask() {
+  function openNewTask(anytime = false) {
     haptic("light");
     setTaskDraft({
       day_date: day,
       title: "",
-      hour: 9,
-      minute: 0,
+      hour: anytime ? null : 9,
+      minute: anytime ? null : 0,
       duration_mins: 30,
       completed: false,
       is_focus: false,
@@ -125,7 +125,7 @@ export default function TodayPage() {
               <PlanTodayCard
                 tasks={tasks}
                 onChooseFocus={openFocus}
-                onAddTask={openNewTask}
+                onAddTask={() => openNewTask(true)}
                 onToggleTask={(task) => void toggleComplete(task)}
               />
 
