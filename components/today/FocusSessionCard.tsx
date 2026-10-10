@@ -149,7 +149,7 @@ export function FocusSessionCard({ focusTask, onChooseFocus, isToday }: { focusT
               <button type="button" className="td-session-secondary" onClick={finish}>Finish session</button>
             )}
             {session.status === "complete" && (
-              <button type="button" className="td-session-primary" onClick={clearSession}><RotateCcw size={16} /> Start another</button>
+              <button type="button" className="td-session-primary" onClick={clearSession}><RotateCcw size={16} /> Set up another</button>
             )}
           </div>
         </>
