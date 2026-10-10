@@ -47,12 +47,12 @@ export function PlanTodayCard({ tasks, onChooseFocus, onAddTask, onToggleTask }:
               {focus.title}
             </button>
           ) : (
-            <button type="button" className="td-plan-add-main" onClick={() => { haptic("light"); onChooseFocus(); }}>
+            <button type="button" className="td-plan-add-main" onClick={onChooseFocus}>
               Choose what matters most <span aria-hidden="true">→</span>
             </button>
           )}
         </div>
-        {focus && <button type="button" className="td-plan-edit" onClick={() => { haptic("light"); onChooseFocus(); }}>Edit</button>}
+        {focus && <button type="button" className="td-plan-edit" onClick={onChooseFocus}>Edit</button>}
       </div>
 
       <div className="td-plan-supports">
@@ -65,7 +65,7 @@ export function PlanTodayCard({ tasks, onChooseFocus, onAddTask, onToggleTask }:
               <span>{task.title}</span>
             </button>
           ) : (
-            <button key={`empty-${slot}`} type="button" className="td-plan-add-support" onClick={() => { haptic("light"); onAddTask(); }}>
+            <button key={`empty-${slot}`} type="button" className="td-plan-add-support" onClick={onAddTask}>
               <Plus size={15} /> Add a small task
             </button>
           );
