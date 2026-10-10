@@ -220,6 +220,35 @@
   color: #0f172a;
 }
 .hm-attention-arrow { flex-shrink: 0; color: #cbd5e1; }
+/* Daily plan: keep the next action visible before the finance summary. */
+.hm-plan {
+  padding: 1.1rem;
+  margin: 0 0 1.4rem;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.045);
+}
+.hm-plan-heading { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+.hm-plan-heading .hm-section-label { margin-bottom: 0.25rem; }
+.hm-plan-title { color: #0f172a; font: 400 1.35rem/1.2 var(--font-display), Georgia, serif; }
+.hm-plan-link, .hm-plan-more { color: #494fdf; font-size: 0.78rem; font-weight: 650; text-decoration: none; white-space: nowrap; }
+.hm-plan-tasks { display: flex; flex-direction: column; gap: 0.1rem; margin-top: 0.8rem; }
+.hm-plan-task { display: flex; align-items: center; gap: 0.7rem; width: 100%; padding: 0.65rem 0; border: 0; background: none; color: #334155; text-align: left; font: inherit; font-size: 0.88rem; cursor: pointer; }
+.hm-plan-task svg { flex: 0 0 auto; color: #a1a9ba; }
+.hm-plan-task:active, .hm-habit:active { transform: scale(0.98); }
+.hm-plan-empty { display: flex; align-items: center; gap: 0.55rem; margin-top: 0.75rem; color: #64748b; font-size: 0.84rem; }
+.hm-plan-empty-link { padding: 0.75rem; border: 1px dashed rgba(73, 79, 223, 0.24); border-radius: 12px; color: #494fdf; text-decoration: none; }
+.hm-plan-more { align-self: flex-start; padding: 0.25rem 0 0.2rem 1.9rem; }
+.hm-plan-divider { height: 1px; margin: 0.8rem 0; background: rgba(15, 23, 42, 0.07); }
+.hm-habits-heading { align-items: end; }
+.hm-habits-title { color: #0f172a; font-size: 0.92rem; font-weight: 650; }
+.hm-habit-count { color: #64748b; font-size: 0.78rem; font-variant-numeric: tabular-nums; }
+.hm-habits { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.75rem; }
+.hm-habit { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.65rem; border: 1px solid rgba(15, 23, 42, 0.09); border-radius: 999px; background: #fff; color: #475569; font: inherit; font-size: 0.74rem; cursor: pointer; transition: transform 0.12s, background 0.12s; }
+.hm-habit-icon { display: grid; min-width: 1rem; place-items: center; color: #818cf8; font-size: 0.82rem; }
+.hm-habit.is-done { border-color: rgba(5, 150, 105, 0.2); background: #ecfdf5; color: #047857; }
+.hm-habit.is-done .hm-habit-icon { color: #059669; }
 
 .hm-sync {
   position: fixed;
