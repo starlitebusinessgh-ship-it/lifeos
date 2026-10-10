@@ -1,8 +1,12 @@
 # LifeOS personal reset: implementation roadmap
 
-Status: planned; repository inspection completed, no application changes or live database migrations.
+Status: in progress; repository inspection and the first daily planning features are underway.
 Reviewed main commit: 348eaa3ef7c87e4f3b6e68fe9954fe39bb9c4952 (2026-10-10).
 Scope: one person's private management app, mobile first. Preserve existing modules and records.
+
+Current draft work adds task and habit check-ins to Home, a guided one-priority/two-step
+plan to Today, and an on-device focus timer with pause/resume. Rendered UI, lint and build
+verification are pending because the workspace could not install dependencies.
 
 ## Product outcome
 
@@ -121,5 +125,6 @@ No completion date is promised before baseline build and deployment access are v
 
 ## Next implementation slice
 
-Phase 0: establish baseline checks and map owner authentication, tables, storage and API authorization.
-Then phase 1: wire the daily priorities and habit/routine summary into the existing home screen.
+First, verify the Home and Today screens visually and run lint/build once dependencies are available.
+Then complete the private access audit and design an owner-preserving migration before changing data policies.
+Continue with routine anchors, weekly review and recovery mode after that foundation is clear.
