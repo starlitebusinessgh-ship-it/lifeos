@@ -8,7 +8,7 @@ import { useDayTasks } from "@/lib/today/useDayTasks";
 import { buildDayTimeline, todayIso } from "@/lib/today/timeline";
 import type { DayTaskDraft } from "@/lib/today/taskTypes";
 import { DayStrip } from "@/components/today/DayStrip";
-import { FocusCard } from "@/components/today/FocusCard";
+import { PlanTodayCard } from "@/components/today/PlanTodayCard";
 import { DayTimelineView } from "@/components/today/DayTimeline";
 import { TaskSheet } from "@/components/today/TaskSheet";
 import { AlarmScheduler, NotificationPrompt } from "@/components/today/AlarmScheduler";
@@ -122,11 +122,11 @@ export default function TodayPage() {
             <div className="td-skel td-skel-hero" />
           ) : (
             <>
-              <FocusCard
-                focus={timeline.focus}
+              <PlanTodayCard
                 tasks={tasks}
-                onSetFocus={openFocus}
-                onToggle={(t) => void toggleComplete(t)}
+                onChooseFocus={openFocus}
+                onAddTask={openNewTask}
+                onToggleTask={(task) => void toggleComplete(task)}
               />
 
               <DayTimelineView
