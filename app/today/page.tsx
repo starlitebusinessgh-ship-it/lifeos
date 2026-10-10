@@ -9,6 +9,7 @@ import { buildDayTimeline, todayIso } from "@/lib/today/timeline";
 import type { DayTaskDraft } from "@/lib/today/taskTypes";
 import { DayStrip } from "@/components/today/DayStrip";
 import { PlanTodayCard } from "@/components/today/PlanTodayCard";
+import { FocusSessionCard } from "@/components/today/FocusSessionCard";
 import { DayTimelineView } from "@/components/today/DayTimeline";
 import { TaskSheet } from "@/components/today/TaskSheet";
 import { AlarmScheduler, NotificationPrompt } from "@/components/today/AlarmScheduler";
@@ -128,6 +129,7 @@ export default function TodayPage() {
                 onAddTask={() => openNewTask(true)}
                 onToggleTask={(task) => void toggleComplete(task)}
               />
+              <FocusSessionCard focusTask={timeline.focus} onChooseFocus={openFocus} isToday={day === todayIso()} />
 
               <DayTimelineView
                 timeline={timeline}
