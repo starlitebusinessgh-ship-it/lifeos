@@ -129,7 +129,7 @@ export default function TodayPage() {
                 onAddTask={() => openNewTask(true)}
                 onToggleTask={(task) => void toggleComplete(task)}
               />
-              <FocusSessionCard focusTask={timeline.focus} onChooseFocus={openFocus} isToday={day === todayIso()} />
+              <FocusSessionCard focusTask={timeline.focus?.completed ? null : timeline.focus} onChooseFocus={openFocus} isToday={day === todayIso()} />
 
               <DayTimelineView
                 timeline={timeline}
