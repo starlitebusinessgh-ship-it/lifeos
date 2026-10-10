@@ -416,6 +416,10 @@
 [data-theme="dark"] .td-session-icon { background: rgba(167, 162, 255, 0.15); color: #c2beff; }
 [data-theme="dark"] .td-session-presets button.selected { background: rgba(167, 162, 255, 0.15); color: #d2ceff; }
 [data-theme="dark"] .td-session-primary { background: #7671d8; }
+.td-plan-card button:focus-visible, .td-session-card button:focus-visible, .hm-plan button:focus-visible { outline: 3px solid #7773e8; outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) {
+  .td-session-track span, .hm-plan-progress-track span, .td-plan-card *, .td-session-card * { scroll-behavior: auto !important; animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
 
 .td-timeline { margin-bottom: 2rem; }
 .td-tl-section {
