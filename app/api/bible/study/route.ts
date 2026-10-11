@@ -1,19 +1,58 @@
 import { NextResponse } from "next/server";
-import { loadVerseStudy } from "@/lib/bible/study";
+import { getBibleBook } from "@/lib/bible/books";
+
+interface VerseStudyFile {
+  book: string;
+  bookId: string;
+  language: "hebrew" | "greek";
+  verses: Record<string, unknown[]>;
+}
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const book = searchParams.get("book");
+  const bookId = searchParams.get("book") ?? "";
   const chapter = Number(searchParams.get("chapter"));
   const verse = Number(searchParams.get("verse"));
+  const book = getBibleBook(bookId);
 
-  if (!book || !Number.isFinite(chapter) || !Number.isFinite(verse)) {
-    return NextResponse.json({ error: "book, chapter, and verse required" }, { status: 400 });
+  if (!book || !Number.isInteger(chapter) || chapter < 1 || chapter > book.chapters ||
+      !Number.isInteger(verse) || verse < 1) {
+    return NextResponse.json(
+      { error: "Valid book, chapter, and verse required" },
+      { status: 400 }
+    );
   }
 
-  const result = loadVerseStudy(book, chapter, verse);
-  if ("error" in result) {
-    return NextResponse.json(result, { status: 404 });
+  try {
+    const assetUrl = new URL(
+      `/bible/data/study/verses/${encodeURIComponent(book.id)}/${chapter}.json`,
+      req.url
+    );
+    const headers = new Headers();
+    for (const name of ["cookie", "authorization", "x-vercel-protection-bypass"]) {
+      const value = req.headers.get(name);
+      if (value) headers.set(name, value);
+    }
+    const response = await fetch(assetUrl, { cache: "force-cache", headers });
+    if (!response.ok) {
+      return NextResponse.json({ error: "Study data not found for this chapter" }, { status: 404 });
+    }
+
+    const data = (await response.json()) as VerseStudyFile;
+    const words = data.verses[String(verse)];
+    if (!words?.length) {
+      return NextResponse.json({ error: "Verse not found in study index" }, { status: 404 });
+    }
+
+    return NextResponse.json({
+      book: data.book,
+      bookId: data.bookId,
+      chapter,
+      verse,
+      words,
+      language: data.language,
+    });
+  } catch {
+    return NextResponse.json({ error: "Unable to load study data" }, { status: 502 });
   }
-  return NextResponse.json(result);
 }

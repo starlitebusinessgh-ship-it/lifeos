@@ -20,12 +20,16 @@ const ROOT = path.join(__dirname, "..");
 const DATA_DIR = path.join(ROOT, "data", "bible");
 const PUBLIC_DIR = path.join(ROOT, "public", "bible", "data");
 const STUDY_DIR = path.join(ROOT, "data", "bible", "study");
+const PUBLIC_STUDY_DIR = path.join(PUBLIC_DIR, "study");
 const SEARCH_DIR = path.join(ROOT, "data", "bible", "search");
+const PUBLIC_SEARCH_DIR = path.join(PUBLIC_DIR, "search");
 
 const BOLLS_CDN = "https://bolls.life/static/translations";
 const MORPHGNT = "https://raw.githubusercontent.com/morphgnt/sblgnt/master";
 const STRONGS_HEB = "https://raw.githubusercontent.com/openscriptures/strongs/master/hebrew/strongs-hebrew-dictionary.js";
 const STRONGS_GRK = "https://raw.githubusercontent.com/openscriptures/strongs/master/greek/strongs-greek-dictionary.js";
+const FETCH_TIMEOUT_MS = 45_000;
+const MORPHGNT_CONCURRENCY = 4;
 
 const TRANSLATIONS = [
   { id: "kjv", slug: "KJV" },
@@ -138,13 +142,13 @@ const MORPHGNT_BOOKS = [
 function ensureDir(dir) { fs.mkdirSync(dir, { recursive: true }); }
 
 async function fetchJson(url) {
-  const res = await fetch(url);
+  const res = await fetch(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
   if (!res.ok) throw new Error(`${res.status} ${url}`);
   return res.json();
 }
 
 async function fetchText(url) {
-  const res = await fetch(url);
+  const res = await fetch(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
   if (!res.ok) throw new Error(`${res.status} ${url}`);
   return res.text();
 }
@@ -213,7 +217,10 @@ async function buildTranslation(transId, bollsSlug) {
   }
 
   ensureDir(SEARCH_DIR);
-  fs.writeFileSync(path.join(SEARCH_DIR, `${transId}.json`), JSON.stringify(searchIndex));
+  ensureDir(PUBLIC_SEARCH_DIR);
+  const searchJson = JSON.stringify(searchIndex);
+  fs.writeFileSync(path.join(SEARCH_DIR, `${transId}.json`), searchJson);
+  fs.writeFileSync(path.join(PUBLIC_SEARCH_DIR, `${transId}.json`), searchJson);
   console.log(`  ✓ ${transId} done (${searchIndex.length} verses)`);
 }
 
@@ -272,7 +279,10 @@ async function buildStrongs() {
 
   parseDict(hebJs, "hebrew");
   parseDict(grkJs, "greek");
-  fs.writeFileSync(path.join(STUDY_DIR, "strongs.json"), JSON.stringify(lexicon));
+  const lexiconJson = JSON.stringify(lexicon);
+  fs.writeFileSync(path.join(STUDY_DIR, "strongs.json"), lexiconJson);
+  ensureDir(PUBLIC_STUDY_DIR);
+  fs.writeFileSync(path.join(PUBLIC_STUDY_DIR, "strongs.json"), lexiconJson);
   console.log(`  ✓ ${Object.keys(lexicon).length} Strong's entries`);
   return lexicon;
 }
@@ -369,74 +379,104 @@ function glossFromStrongs(lexicon, strongs) {
   return entry.definition.split(/[;,]/)[0]?.trim() || null;
 }
 
-function lemmaToStrongsGuess(lemma, lexicon) {
-  const clean = stripDiacritics(lemma.replace(/[,;.:()]+$/g, "")).toLowerCase();
+function normalizeGreekLemma(lemma) {
+  return stripDiacritics(lemma.replace(/[,;.:()]+$/g, "")).toLowerCase();
+}
+
+function buildGreekLemmaIndex(lexicon) {
+  const index = new Map();
   for (const [num, entry] of Object.entries(lexicon)) {
     if (entry.language !== "greek") continue;
-    const el = stripDiacritics(entry.lemma ?? "").toLowerCase();
-    if (el === clean) return num;
+    const key = normalizeGreekLemma(entry.lemma ?? "");
+    if (key && !index.has(key)) index.set(key, num);
   }
-  return null;
+  return index;
+}
+
+function lemmaToStrongsGuess(lemma, greekLemmaIndex) {
+  return greekLemmaIndex.get(normalizeGreekLemma(lemma)) ?? null;
 }
 
 function writeStudyChapter(bookId, chapter, data) {
   const dir = path.join(STUDY_DIR, "verses", bookId);
   ensureDir(dir);
-  fs.writeFileSync(path.join(dir, `${chapter}.json`), JSON.stringify(data));
+  const json = JSON.stringify(data);
+  fs.writeFileSync(path.join(dir, `${chapter}.json`), json);
+  const publicDir = path.join(PUBLIC_STUDY_DIR, "verses", bookId);
+  ensureDir(publicDir);
+  fs.writeFileSync(path.join(publicDir, `${chapter}.json`), json);
 }
 
 async function buildMorphGnt(lexicon) {
   console.log("\n🇬🇷 Building Greek word study index...");
+  const greekLemmaIndex = buildGreekLemmaIndex(lexicon);
   let chapterCount = 0;
+  let nextIndex = 0;
+  let firstError = null;
 
-  for (const { file, bookId } of MORPHGNT_BOOKS) {
-    const text = await fetchText(`${MORPHGNT}/${file}`);
-    const book = BIBLE_BOOKS.find((b) => b.id === bookId);
-    if (!book) continue;
+  async function worker() {
+    while (!firstError) {
+      const index = nextIndex++;
+      if (index >= MORPHGNT_BOOKS.length) return;
 
-    const byChapter = {};
+      const { file, bookId } = MORPHGNT_BOOKS[index];
+      const book = BIBLE_BOOKS.find((b) => b.id === bookId);
+      if (!book) continue;
 
-    for (const line of text.split("\n")) {
-      if (!line.trim()) continue;
-      const parts = line.trim().split(/\s+/);
-      if (parts.length < 7) continue;
-      const ref = parts[0];
-      const morph = parts[1];
-      const word = parts[3];
-      const lemma = parts[parts.length - 1];
-      if (!ref || ref.length < 6) continue;
+      try {
+        console.log(`  Fetching ${book.name} (${file})...`);
+        const text = await fetchText(`${MORPHGNT}/${file}`);
+        const byChapter = {};
 
-      const chapter = Number(ref.slice(2, 4));
-      const verse = Number(ref.slice(4, 6));
-      if (!chapter || !verse) continue;
+        for (const line of text.split("\n")) {
+          if (!line.trim()) continue;
+          const parts = line.trim().split(/\s+/);
+          if (parts.length < 7) continue;
+          const ref = parts[0];
+          const morph = parts[1];
+          const word = parts[3];
+          const lemma = parts[parts.length - 1];
+          if (!ref || ref.length < 6) continue;
 
-      if (!byChapter[chapter]) {
-        byChapter[chapter] = { book: book.name, bookId, language: "greek", verses: {} };
+          const chapter = Number(ref.slice(2, 4));
+          const verse = Number(ref.slice(4, 6));
+          if (!chapter || !verse) continue;
+
+          if (!byChapter[chapter]) {
+            byChapter[chapter] = { book: book.name, bookId, language: "greek", verses: {} };
+          }
+          const vk = String(verse);
+          if (!byChapter[chapter].verses[vk]) byChapter[chapter].verses[vk] = [];
+
+          const strongs = lemmaToStrongsGuess(lemma, greekLemmaIndex);
+          const strongsEntry = strongs ? lexicon[strongs] : null;
+          const pos = morph.replace(/-$/, "").charAt(0).toUpperCase() || parseMorphPos(morph);
+
+          byChapter[chapter].verses[vk].push({
+            position: byChapter[chapter].verses[vk].length + 1,
+            original: word,
+            transliteration: strongsEntry?.transliteration || transliterateGreek(lemma),
+            lemma,
+            strongs,
+            gloss: glossFromStrongs(lexicon, strongs) || transliterateGreek(lemma),
+            language: "greek",
+            pos,
+          });
+        }
+
+        const chapters = Object.entries(byChapter);
+        for (const [ch, data] of chapters) writeStudyChapter(bookId, ch, data);
+        chapterCount += chapters.length;
+        console.log(`  ✓ ${book.name}: ${chapters.length} chapters`);
+      } catch (error) {
+        firstError ??= error;
       }
-      const vk = String(verse);
-      if (!byChapter[chapter].verses[vk]) byChapter[chapter].verses[vk] = [];
-
-      const strongs = lemmaToStrongsGuess(lemma, lexicon);
-      const strongsEntry = strongs ? lexicon[strongs] : null;
-      const pos = morph.replace(/-$/, "").charAt(0).toUpperCase() || parseMorphPos(morph);
-
-      byChapter[chapter].verses[vk].push({
-        position: byChapter[chapter].verses[vk].length + 1,
-        original: word,
-        transliteration: strongsEntry?.transliteration || transliterateGreek(lemma),
-        lemma,
-        strongs,
-        gloss: glossFromStrongs(lexicon, strongs) || transliterateGreek(lemma),
-        language: "greek",
-        pos,
-      });
-    }
-
-    for (const [ch, data] of Object.entries(byChapter)) {
-      writeStudyChapter(bookId, ch, data);
-      chapterCount++;
     }
   }
+
+  const workerCount = Math.min(MORPHGNT_CONCURRENCY, MORPHGNT_BOOKS.length);
+  await Promise.all(Array.from({ length: workerCount }, () => worker()));
+  if (firstError) throw firstError;
   console.log(`  ✓ Greek study: ${chapterCount} chapters`);
 }
 

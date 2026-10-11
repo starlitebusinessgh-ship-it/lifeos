@@ -10,6 +10,7 @@ import { formatMoney } from "@/lib/finance/logic";
 import { BalanceCard } from "@/components/finance/BalanceCard";
 import type { HomeSignal } from "@/lib/home/briefing";
 import { haptic } from "@/lib/finance/haptics";
+import { HomeDailyPlan } from "./HomeDailyPlan";
 
 function AttentionRow({ signal }: { signal: HomeSignal }) {
   const urgent = signal.priority >= 70;
@@ -100,6 +101,8 @@ export function HomeCanvas() {
             <h1 className="hm-headline">{briefing.headline}</h1>
             <p className="hm-subline">{briefing.subline}</p>
           </motion.header>
+
+          <HomeDailyPlan />
 
           <motion.section
             className="hm-finance-block"

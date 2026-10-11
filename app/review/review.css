@@ -1,0 +1,26 @@
+.rv-app{min-height:100%;background:#f7f8fc;color:#20243a;padding:30px 22px 48px;font-family:var(--font-sans,Inter,system-ui,sans-serif)}
+.rv-shell{max-width:900px;margin:0 auto}
+.rv-heading{display:flex;align-items:center;justify-content:space-between;margin:8px 0 26px;gap:18px}
+.rv-eyebrow{display:block;color:#7b7e99;font-size:10px;line-height:1.2;font-weight:800;letter-spacing:.14em}
+.rv-heading h1{margin:9px 0 7px;font-size:clamp(27px,4vw,38px);line-height:1.1;letter-spacing:-.045em;font-weight:750;color:#22243b}
+.rv-heading p{margin:0;color:#777b91;font-size:13px}
+.rv-mark{width:46px;height:46px;display:grid;place-items:center;border-radius:15px;background:#eeeaff;color:#7761d8;flex:none}
+.rv-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.rv-metric{position:relative;display:flex;flex-direction:column;min-height:149px;padding:17px 18px;border:1px solid #ebeaf3;border-radius:18px;background:#fff;box-shadow:0 5px 18px #30315708}
+.rv-metric-icon{width:34px;height:34px;display:grid;place-items:center;border-radius:11px;margin-bottom:12px}
+.rv-metric strong{font-size:27px;letter-spacing:-.04em;line-height:1.05;color:#25263b}
+.rv-metric>span:nth-of-type(2){font-size:12px;font-weight:700;color:#484b62;margin-top:5px}
+.rv-metric small{font-size:10px;color:#9294a6;margin-top:auto;padding-top:10px}
+.rv-metric-violet .rv-metric-icon{background:#f0edff;color:#7b68dc}.rv-metric-blue .rv-metric-icon{background:#eaf3ff;color:#5687cf}.rv-metric-mint .rv-metric-icon{background:#e8f8f3;color:#39a688}
+.rv-reflect{display:flex;gap:15px;margin-top:16px;padding:23px;border:1px solid #ebeaf3;border-radius:20px;background:#fff;box-shadow:0 5px 18px #30315708}
+.rv-section-icon{width:39px;height:39px;display:grid;place-items:center;border-radius:13px;background:#f3efff;color:#7965d9;flex:none}
+.rv-reflect-body{flex:1;min-width:0}.rv-reflect h2,.rv-recovery h2{margin:6px 0 5px;font-size:18px;letter-spacing:-.025em;color:#27283d}.rv-reflect p,.rv-recovery p{margin:0;color:#7d8093;font-size:12px;line-height:1.5}
+.rv-reflect textarea{display:block;width:100%;min-height:82px;resize:vertical;margin-top:15px;padding:12px 13px;border:1px solid #e7e7ef;border-radius:12px;background:#fbfbfd;color:#292a40;font:inherit;font-size:13px;outline:none;transition:border-color .18s,box-shadow .18s}
+.rv-reflect textarea:focus{border-color:#a294ed;box-shadow:0 0 0 3px #7965d91a}.rv-reflect textarea::placeholder{color:#aaabba}
+.rv-reflect-actions{display:flex;align-items:center;justify-content:space-between;margin-top:10px;gap:12px}.rv-reflect-actions span{font-size:10px;color:#a0a1b0}.rv-reflect-actions button,.rv-recovery-toggle{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:0 14px;border:0;border-radius:10px;background:#292a44;color:#fff;font:inherit;font-size:11px;font-weight:700;cursor:pointer;transition:transform .15s,background .15s}.rv-reflect-actions button:hover,.rv-recovery-toggle:hover{background:#454666;transform:translateY(-1px)}
+.rv-recovery{display:flex;align-items:flex-start;gap:14px;margin-top:16px;padding:20px 22px;border:1px solid #e9e8f1;border-radius:18px;background:linear-gradient(120deg,#fff 0%,#faf9ff 100%)}
+.rv-recovery.active{border-color:#d4caef;background:linear-gradient(120deg,#fff 0%,#f4f0ff 100%)}.rv-recovery-icon{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:#f0edff;color:#7762d8;flex:none}.rv-recovery-copy{flex:1}.rv-recovery h2{font-size:16px}.rv-recovery-copy p{max-width:570px}.rv-recovery-toggle{margin-top:13px;min-height:34px;background:#eeeaff;color:#6251bd}.rv-recovery-toggle:hover{background:#e3ddff}.rv-today-link{width:36px;height:36px;display:grid;place-items:center;border-radius:11px;background:#fff;color:#6251bd;box-shadow:0 2px 8px #23214412}
+.rv-footnote{margin:15px 3px 0;color:#9b9dad;font-size:10px;text-align:center}
+@media(max-width:620px){.rv-app{padding:23px 15px 38px}.rv-heading{margin:5px 0 20px}.rv-metrics{gap:8px}.rv-metric{padding:13px 12px;min-height:139px;border-radius:15px}.rv-metric strong{font-size:23px}.rv-metric small{font-size:9px}.rv-reflect{padding:18px 15px;gap:11px}.rv-recovery{padding:17px 15px}.rv-mark{width:40px;height:40px}}
+@media(max-width:390px){.rv-metric{padding:12px 9px}.rv-metric strong{font-size:21px}.rv-metric-icon{width:30px;height:30px}.rv-recovery-icon{width:34px;height:34px}}
+@media(prefers-reduced-motion:reduce){.rv-reflect textarea,.rv-reflect-actions button,.rv-recovery-toggle{transition:none}}

@@ -2,9 +2,12 @@ import { supabase } from "@/lib/supabase";
 
 const BUCKET = "library-pdfs";
 
-export function pdfPublicUrl(filePath: string): string {
-  const { data } = supabase.storage.from(BUCKET).getPublicUrl(filePath);
-  return data.publicUrl;
+export async function pdfSignedUrl(filePath: string): Promise<string | null> {
+  const { data, error } = await supabase.storage
+    .from(BUCKET)
+    .createSignedUrl(filePath, 60 * 60);
+  if (error) return null;
+  return data.signedUrl;
 }
 
 export async function uploadPdfFile(

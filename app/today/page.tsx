@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Plus, AlarmClock } from "lucide-react";
 import { useAlarms } from "@/lib/today/useAlarms";
@@ -8,7 +8,8 @@ import { useDayTasks } from "@/lib/today/useDayTasks";
 import { buildDayTimeline, todayIso } from "@/lib/today/timeline";
 import type { DayTaskDraft } from "@/lib/today/taskTypes";
 import { DayStrip } from "@/components/today/DayStrip";
-import { FocusCard } from "@/components/today/FocusCard";
+import { PlanTodayCard } from "@/components/today/PlanTodayCard";
+import { FocusSessionCard } from "@/components/today/FocusSessionCard";
 import { DayTimelineView } from "@/components/today/DayTimeline";
 import { TaskSheet } from "@/components/today/TaskSheet";
 import { AlarmScheduler, NotificationPrompt } from "@/components/today/AlarmScheduler";
@@ -16,6 +17,7 @@ import { AlarmRing } from "@/components/today/AlarmRing";
 import { NativeAlarmSync } from "@/components/today/NativeAlarmSync";
 import { TodayPullRefresh } from "@/components/today/TodayPullRefresh";
 import { haptic } from "@/lib/finance/haptics";
+import { isRecoveryDay } from "@/lib/today/recoveryMode";
 
 export default function TodayPage() {
   const [day, setDay] = useState(todayIso);
@@ -26,6 +28,11 @@ export default function TodayPage() {
   const [focusSheetOpen, setFocusSheetOpen] = useState(false);
   const [taskDraft, setTaskDraft] = useState<DayTaskDraft | null>(null);
   const [saving, setSaving] = useState(false);
+  const [recoveryMode, setRecoveryMode] = useState(false);
+
+  useEffect(() => {
+    setRecoveryMode(day === todayIso() && isRecoveryDay(day));
+  }, [day]);
 
   const timeline = useMemo(
     () => buildDayTimeline(day, alarms, tasks),
@@ -36,13 +43,13 @@ export default function TodayPage() {
     await Promise.all([reload(), reloadAlarms()]);
   }
 
-  function openNewTask() {
+  function openNewTask(anytime = false) {
     haptic("light");
     setTaskDraft({
       day_date: day,
       title: "",
-      hour: 9,
-      minute: 0,
+      hour: anytime ? null : 9,
+      minute: anytime ? null : 0,
       duration_mins: 30,
       completed: false,
       is_focus: false,
@@ -122,12 +129,14 @@ export default function TodayPage() {
             <div className="td-skel td-skel-hero" />
           ) : (
             <>
-              <FocusCard
-                focus={timeline.focus}
+              <PlanTodayCard
                 tasks={tasks}
-                onSetFocus={openFocus}
-                onToggle={(t) => void toggleComplete(t)}
+                recoveryMode={recoveryMode}
+                onChooseFocus={openFocus}
+                onAddTask={() => openNewTask(true)}
+                onToggleTask={(task) => void toggleComplete(task)}
               />
+              <FocusSessionCard focusTask={timeline.focus?.completed ? null : timeline.focus} onChooseFocus={openFocus} isToday={day === todayIso()} />
 
               <DayTimelineView
                 timeline={timeline}
@@ -139,7 +148,7 @@ export default function TodayPage() {
             </>
           )}
 
-          <button type="button" className="td-fab" aria-label="Add task" onClick={openNewTask}>
+          <button type="button" className="td-fab" aria-label="Add task" onClick={() => openNewTask()}>
             <Plus size={24} strokeWidth={2} />
           </button>
         </div>
