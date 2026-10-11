@@ -51,7 +51,7 @@ export function BalanceCard({ balance }: { balance: number }) {
       </div>
 
       <div className="rv-master-card-foot">
-        <span className="rv-master-name">CHRISTIAN ANTWI</span>
+        <span className="rv-master-name">PERSONAL ACCOUNT</span>
       </div>
     </motion.div>
   );
