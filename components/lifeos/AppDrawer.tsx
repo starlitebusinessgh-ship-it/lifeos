@@ -15,6 +15,7 @@ import {
   PenLine,
   Archive,
   Settings,
+  ClipboardCheck,
   X,
 } from "lucide-react";
 
@@ -32,6 +33,7 @@ const GROUPS: { label: string; items: DrawerModule[] }[] = [
     items: [
       { id: "home", label: "Home", href: "/", color: "#ff8c42" },
       { id: "today", label: "Today", href: "/today", color: "#ff9f5a" },
+      { id: "review", label: "Weekly review", href: "/review", color: "#a78bfa" },
       { id: "inbox", label: "Inbox", href: "/inbox", color: "#8b9fff" },
     ],
   },
@@ -56,6 +58,7 @@ const GROUPS: { label: string; items: DrawerModule[] }[] = [
 const ICONS: Record<string, typeof Home> = {
   home: Home,
   today: Sun,
+  review: ClipboardCheck,
   inbox: Inbox,
   finance: Wallet,
   vitality: HeartPulse,
