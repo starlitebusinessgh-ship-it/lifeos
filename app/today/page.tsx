@@ -148,7 +148,7 @@ export default function TodayPage() {
             </>
           )}
 
-          <button type="button" className="td-fab" aria-label="Add task" onClick={openNewTask}>
+          <button type="button" className="td-fab" aria-label="Add task" onClick={() => openNewTask()}>
             <Plus size={24} strokeWidth={2} />
           </button>
         </div>
