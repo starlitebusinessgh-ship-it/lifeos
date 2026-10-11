@@ -41,6 +41,7 @@
     "figma-ui",
     "src",
     "vite.config.ts",
-    "index.html"
+    "index.html",
+    "sermon-display/frontend"
   ]
 }
