@@ -20,6 +20,7 @@ const ROOT = path.join(__dirname, "..");
 const DATA_DIR = path.join(ROOT, "data", "bible");
 const PUBLIC_DIR = path.join(ROOT, "public", "bible", "data");
 const STUDY_DIR = path.join(ROOT, "data", "bible", "study");
+const PUBLIC_STUDY_DIR = path.join(PUBLIC_DIR, "study");
 const SEARCH_DIR = path.join(ROOT, "data", "bible", "search");
 const PUBLIC_SEARCH_DIR = path.join(PUBLIC_DIR, "search");
 
@@ -278,7 +279,10 @@ async function buildStrongs() {
 
   parseDict(hebJs, "hebrew");
   parseDict(grkJs, "greek");
-  fs.writeFileSync(path.join(STUDY_DIR, "strongs.json"), JSON.stringify(lexicon));
+  const lexiconJson = JSON.stringify(lexicon);
+  fs.writeFileSync(path.join(STUDY_DIR, "strongs.json"), lexiconJson);
+  ensureDir(PUBLIC_STUDY_DIR);
+  fs.writeFileSync(path.join(PUBLIC_STUDY_DIR, "strongs.json"), lexiconJson);
   console.log(`  ✓ ${Object.keys(lexicon).length} Strong's entries`);
   return lexicon;
 }
@@ -396,7 +400,11 @@ function lemmaToStrongsGuess(lemma, greekLemmaIndex) {
 function writeStudyChapter(bookId, chapter, data) {
   const dir = path.join(STUDY_DIR, "verses", bookId);
   ensureDir(dir);
-  fs.writeFileSync(path.join(dir, `${chapter}.json`), JSON.stringify(data));
+  const json = JSON.stringify(data);
+  fs.writeFileSync(path.join(dir, `${chapter}.json`), json);
+  const publicDir = path.join(PUBLIC_STUDY_DIR, "verses", bookId);
+  ensureDir(publicDir);
+  fs.writeFileSync(path.join(publicDir, `${chapter}.json`), json);
 }
 
 async function buildMorphGnt(lexicon) {
