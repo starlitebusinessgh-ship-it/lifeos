@@ -21,6 +21,7 @@ const DATA_DIR = path.join(ROOT, "data", "bible");
 const PUBLIC_DIR = path.join(ROOT, "public", "bible", "data");
 const STUDY_DIR = path.join(ROOT, "data", "bible", "study");
 const SEARCH_DIR = path.join(ROOT, "data", "bible", "search");
+const PUBLIC_SEARCH_DIR = path.join(PUBLIC_DIR, "search");
 
 const BOLLS_CDN = "https://bolls.life/static/translations";
 const MORPHGNT = "https://raw.githubusercontent.com/morphgnt/sblgnt/master";
@@ -215,7 +216,10 @@ async function buildTranslation(transId, bollsSlug) {
   }
 
   ensureDir(SEARCH_DIR);
-  fs.writeFileSync(path.join(SEARCH_DIR, `${transId}.json`), JSON.stringify(searchIndex));
+  ensureDir(PUBLIC_SEARCH_DIR);
+  const searchJson = JSON.stringify(searchIndex);
+  fs.writeFileSync(path.join(SEARCH_DIR, `${transId}.json`), searchJson);
+  fs.writeFileSync(path.join(PUBLIC_SEARCH_DIR, `${transId}.json`), searchJson);
   console.log(`  ✓ ${transId} done (${searchIndex.length} verses)`);
 }
 
