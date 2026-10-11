@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { Menu, Plus, ChevronRight, AlertCircle } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 import { useShell } from "@/components/lifeos/ShellContext";
 import { useHomeData } from "@/lib/home/useHomeData";
 import { formatMoney } from "@/lib/finance/logic";
@@ -47,7 +48,22 @@ export function HomeCanvas() {
   const { openDrawer, openCapture } = useShell();
   const { briefing, balance, month, loading, reload } = useHomeData();
   const [synced, setSynced] = useState(false);
+  const [isPreview, setIsPreview] = useState(true);
   const startY = useRef(0);
+
+  useEffect(() => {
+    let alive = true;
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (alive) setIsPreview(!session);
+    });
+    void supabase.auth.getSession().then(({ data }) => {
+      if (alive) setIsPreview(!data.session);
+    });
+    return () => {
+      alive = false;
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
 
   const onRefresh = useCallback(async () => {
     haptic("light");
@@ -98,11 +114,30 @@ export function HomeCanvas() {
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
             <p className="hm-date">{briefing.dateLabel}</p>
-            <h1 className="hm-headline">{briefing.headline}</h1>
-            <p className="hm-subline">{briefing.subline}</p>
+            <h1 className="hm-headline">{isPreview ? "Your life, in one place." : briefing.headline}</h1>
+            <p className="hm-subline">
+              {isPreview
+                ? "Explore the public preview. Your plans and personal data stay private while we finish testing."
+                : briefing.subline}
+            </p>
           </motion.header>
 
-          <HomeDailyPlan />
+          {isPreview ? (
+            <section className="hm-plan hm-preview-card" aria-label="Public preview">
+              <div className="hm-plan-heading">
+                <div>
+                  <p className="hm-plan-eyebrow">A LOOK AROUND LIFEOS</p>
+                  <h2 className="hm-plan-title">Explore your workspace</h2>
+                </div>
+              </div>
+              <p className="hm-preview-copy">Personal plans and finance are hidden in this test version.</p>
+              <div className="hm-preview-shortcuts">
+                <Link href="/today">Today <ChevronRight size={15} /></Link>
+                <Link href="/finance">Finance <ChevronRight size={15} /></Link>
+                <Link href="/learn">Learn <ChevronRight size={15} /></Link>
+              </div>
+            </section>
+          ) : <HomeDailyPlan />}
 
           <motion.section
             className="hm-finance-block"
@@ -111,9 +146,9 @@ export function HomeCanvas() {
             transition={{ duration: 0.5, delay: 0.06, ease: [0.22, 1, 0.36, 1] }}
           >
             <Link href="/finance" className="hm-finance-link" onClick={() => haptic("light")}>
-              <BalanceCard balance={balance} />
+              <BalanceCard balance={balance} preview={isPreview} />
             </Link>
-            <div className="hm-month-row">
+            {!isPreview && <div className="hm-month-row">
               <span className="hm-month-label">This month</span>
               <span className={`hm-month-value ${month.net >= 0 ? "pos" : "neg"}`}>
                 {month.net >= 0 ? "+" : ""}
@@ -122,10 +157,10 @@ export function HomeCanvas() {
               <Link href="/finance/analytics" className="hm-month-link">
                 Charts →
               </Link>
-            </div>
+            </div>}
           </motion.section>
 
-          {briefing.attention.length > 0 && (
+          {!isPreview && briefing.attention.length > 0 && (
             <motion.section
               className="hm-attention-block"
               aria-label="Needs attention"

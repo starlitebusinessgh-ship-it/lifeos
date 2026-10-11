@@ -24,7 +24,7 @@ function MastercardMark() {
   );
 }
 
-export function BalanceCard({ balance }: { balance: number }) {
+export function BalanceCard({ balance, preview = false }: { balance: number; preview?: boolean }) {
   const { whole, cents } = splitMoney(balance);
 
   return (
@@ -43,15 +43,14 @@ export function BalanceCard({ balance }: { balance: number }) {
       </div>
 
       <div className="rv-master-card-mid">
-        <div className="rv-master-card-label">Total balance</div>
+        <div className="rv-master-card-label">{preview ? "Private balance" : "Total balance"}</div>
         <div className="rv-master-card-amount">
-          {whole}
-          <span className="cents">{cents}</span>
+          {preview ? <span className="rv-preview-mask" aria-label="Hidden in public preview">••••••</span> : <>{whole}<span className="cents">{cents}</span></>}
         </div>
       </div>
 
       <div className="rv-master-card-foot">
-        <span className="rv-master-name">PERSONAL ACCOUNT</span>
+        <span className="rv-master-name">{preview ? "PRIVATE DATA HIDDEN" : "PERSONAL ACCOUNT"}</span>
       </div>
     </motion.div>
   );
