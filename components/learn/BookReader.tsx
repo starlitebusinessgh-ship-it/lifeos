@@ -144,10 +144,10 @@ export function BookReader({ bookId }: { bookId: string }) {
     window.setTimeout(() => setJumpToPage(null), 300);
   }
 
-  if (loading) {
+  if (loading || (book?.file_path && book.file_path !== "pending" && !url)) {
     return (
       <div className="ln-reader-shell">
-        <div className="ln-reader-loading full">Opening…</div>
+        <div className="ln-reader-loading full">Preparing secure reader…</div>
       </div>
     );
   }

@@ -105,7 +105,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
               <label htmlFor="owner-email">Sign-in email</label>
               <input id="owner-email" type="email" value={OWNER_EMAIL} readOnly />
               <button type="submit" disabled={sending}>
-                {sending ? <LoaderCircle size={17} className="auth-spin" /> : <>Email me a sign-in link <ArrowRight size={17} /></>}
+                {sending ? <><LoaderCircle size={17} className="auth-spin" /> Sending link…</> : <>Email me a sign-in link <ArrowRight size={17} /></>}
               </button>
               {error && <p className="auth-error" role="alert">{error}</p>}
               <p className="auth-form-note">Only your verified email can access this workspace.</p>
