@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Plus, AlarmClock } from "lucide-react";
 import { useAlarms } from "@/lib/today/useAlarms";
@@ -17,6 +17,7 @@ import { AlarmRing } from "@/components/today/AlarmRing";
 import { NativeAlarmSync } from "@/components/today/NativeAlarmSync";
 import { TodayPullRefresh } from "@/components/today/TodayPullRefresh";
 import { haptic } from "@/lib/finance/haptics";
+import { isRecoveryDay } from "@/lib/today/recoveryMode";
 
 export default function TodayPage() {
   const [day, setDay] = useState(todayIso);
@@ -27,6 +28,11 @@ export default function TodayPage() {
   const [focusSheetOpen, setFocusSheetOpen] = useState(false);
   const [taskDraft, setTaskDraft] = useState<DayTaskDraft | null>(null);
   const [saving, setSaving] = useState(false);
+  const [recoveryMode, setRecoveryMode] = useState(false);
+
+  useEffect(() => {
+    setRecoveryMode(day === todayIso() && isRecoveryDay(day));
+  }, [day]);
 
   const timeline = useMemo(
     () => buildDayTimeline(day, alarms, tasks),
@@ -125,6 +131,7 @@ export default function TodayPage() {
             <>
               <PlanTodayCard
                 tasks={tasks}
+                recoveryMode={recoveryMode}
                 onChooseFocus={openFocus}
                 onAddTask={() => openNewTask(true)}
                 onToggleTask={(task) => void toggleComplete(task)}
