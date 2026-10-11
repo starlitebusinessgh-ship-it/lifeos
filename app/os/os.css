@@ -289,6 +289,14 @@
   transition: background 0.15s;
 }
 .lo-drawer-link:hover { background: var(--lo-surface); }
+.lo-signout-link {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+}
 .lo-drawer-link.active {
   background: var(--lo-surface-2);
   box-shadow: inset 0 0 0 1px var(--lo-hairline-2);

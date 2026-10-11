@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Highlighter, Sparkles } from "lucide-react";
@@ -8,7 +8,7 @@ import dynamic from "next/dynamic";
 import { useBook } from "@/lib/learn/useLibrary";
 import { useBookHighlights } from "@/lib/learn/useHighlights";
 import { saveReadingProgress } from "@/lib/learn/progress";
-import { pdfPublicUrl } from "@/lib/learn/storage";
+import { pdfSignedUrl } from "@/lib/learn/storage";
 import { DEFAULT_HIGHLIGHT_COLOR } from "@/lib/learn/highlightColors";
 import {
   sendHighlightToInbox,
@@ -43,6 +43,7 @@ export function BookReader({ bookId }: { bookId: string }) {
   const [jumpToPage, setJumpToPage] = useState<number | null>(null);
   const [readerTheme, setReaderTheme] = useState<ReaderTheme>("light");
   const [zoom, setZoom] = useState(1);
+  const [url, setUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("lifeos-reader-theme") as ReaderTheme | null;
@@ -53,10 +54,16 @@ export function BookReader({ bookId }: { bookId: string }) {
     if (savedZoom) setZoom(Number(savedZoom) || 1);
   }, [bookId]);
 
-  const url = useMemo(
-    () => (book?.file_path && book.file_path !== "pending" ? pdfPublicUrl(book.file_path) : null),
-    [book]
-  );
+  useEffect(() => {
+    let cancelled = false;
+    setUrl(null);
+    const path = book?.file_path;
+    if (!path || path === "pending") return () => { cancelled = true; };
+    void pdfSignedUrl(path).then((signedUrl) => {
+      if (!cancelled) setUrl(signedUrl);
+    });
+    return () => { cancelled = true; };
+  }, [book?.file_path]);
 
   const onPageChange = useCallback(
     (page: number, total: number) => {
