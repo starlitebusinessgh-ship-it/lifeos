@@ -17,9 +17,7 @@ import {
   Settings,
   ClipboardCheck,
   X,
-  LogOut,
 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
 
 interface DrawerModule {
   id: string;
@@ -147,16 +145,6 @@ export function AppDrawer({ open, onClose }: AppDrawerProps) {
               <Settings size={18} strokeWidth={1.75} />
               <span>Settings</span>
             </Link>
-          </div>
-          <div className="lo-drawer-group">
-            <button
-              type="button"
-              className="lo-drawer-link lo-signout-link"
-              onClick={() => void supabase.auth.signOut()}
-            >
-              <LogOut size={18} strokeWidth={1.75} />
-              <span>Sign out</span>
-            </button>
           </div>
         </nav>
       </aside>

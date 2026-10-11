@@ -6,7 +6,6 @@ import { ToastProvider } from "@/components/finance/ToastProvider";
 import { PwaRegister, PwaInstallHint } from "@/components/finance/PwaInstall";
 import { CaptureProvider } from "@/components/inbox/CaptureContext";
 import { GlobalCapture } from "@/components/inbox/GlobalCapture";
-import { AuthGate } from "@/components/auth/AuthGate";
 
 export function LifeOSProviders({ children }: { children: ReactNode }) {
   return (
@@ -14,10 +13,8 @@ export function LifeOSProviders({ children }: { children: ReactNode }) {
       <ToastProvider>
         <CaptureProvider>
           <PwaRegister />
-          <AuthGate>
-            {children}
-            <GlobalCapture />
-          </AuthGate>
+          {children}
+          <GlobalCapture />
           <PwaInstallHint />
         </CaptureProvider>
       </ToastProvider>
