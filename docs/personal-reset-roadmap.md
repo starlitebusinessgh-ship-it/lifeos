@@ -5,8 +5,9 @@ Reviewed main commit: 348eaa3ef7c87e4f3b6e68fe9954fe39bb9c4952 (2026-10-10).
 Scope: one person's private management app, mobile first. Preserve existing modules and records.
 
 Current draft work adds task and habit check-ins to Home, a guided one-priority/two-step
-plan to Today, and an on-device focus timer with pause/resume. Rendered UI, lint and build
-verification are pending because the workspace could not install dependencies.
+plan to Today, an on-device focus timer with pause/resume, and a weekly review with an
+optional on-device reflection and manual recovery mode. Rendered UI, lint and build
+verification are pending because dependencies are unavailable in this workspace.
 
 ## Product outcome
 
@@ -25,7 +26,7 @@ Support planning, action, and reflection with minimal daily administration.
 | Reading | components/learn/; lib/learn/ | Books, progress, highlights, goals and analytics exist. Need a small daily reading action and recall review queue. |
 | Money | app/finance/; lib/finance/ | Entries, budgets, savings, debts and analytics exist. Need pre-purchase pause workflow. |
 | Capture | app/inbox/page.tsx; lib/inbox/useInbox.ts | Extend capture into deliberate task/decision processing. |
-| Privacy | lib/supabase.ts; supabase/migrations/ | Client Supabase access; multiple migrations disable RLS or grant unrestricted access. No owner login flow found in reviewed app paths. Live database configuration is unverified. |
+| Privacy | lib/supabase.ts; supabase/migrations/ | Confirmed: no owner sign-in or ownership columns in the reviewed app; migrations disable RLS on tasks, vitality, habits, habit completions, alarms and finance tables. Do not enable owner-only policies until access and existing-row ownership are designed. Live database configuration is unverified. |
 
 Repository inspection does not establish that deployed features or migrations work.
 No live personal records, hosted settings, or production permissions were accessed.
@@ -125,8 +126,7 @@ No completion date is promised before baseline build and deployment access are v
 
 ## Next implementation slice
 
-First, verify the Home and Today screens visually and run lint/build once dependencies are available.
-Then complete the private access audit and design an owner-preserving migration before changing data policies.
-The first weekly review and recovery mode UI is drafted in this branch; validate the app
-with dependencies installed, review how existing records are safely scoped, then continue
-with routine anchors and a full browser walkthrough.
+The repository audit confirmed that auth and owner fields are absent and sensitive tables
+have RLS disabled. Do not change those policies until an owner sign-in and a safe existing
+data ownership plan are designed. Next, install dependencies, run lint/build, and validate
+the Home, Today, and Review screens in a browser; then continue with routine anchors.
