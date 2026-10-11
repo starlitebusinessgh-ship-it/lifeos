@@ -127,4 +127,6 @@ No completion date is promised before baseline build and deployment access are v
 
 First, verify the Home and Today screens visually and run lint/build once dependencies are available.
 Then complete the private access audit and design an owner-preserving migration before changing data policies.
-Continue with routine anchors, weekly review and recovery mode after that foundation is clear.
+The first weekly review and recovery mode UI is drafted in this branch; validate the app
+with dependencies installed, review how existing records are safely scoped, then continue
+with routine anchors and a full browser walkthrough.
