@@ -28,7 +28,12 @@ export async function GET(req: Request) {
       `/bible/data/study/verses/${encodeURIComponent(book.id)}/${chapter}.json`,
       req.url
     );
-    const response = await fetch(assetUrl, { cache: "force-cache" });
+    const headers = new Headers();
+    for (const name of ["cookie", "authorization", "x-vercel-protection-bypass"]) {
+      const value = req.headers.get(name);
+      if (value) headers.set(name, value);
+    }
+    const response = await fetch(assetUrl, { cache: "force-cache", headers });
     if (!response.ok) {
       return NextResponse.json({ error: "Study data not found for this chapter" }, { status: 404 });
     }
