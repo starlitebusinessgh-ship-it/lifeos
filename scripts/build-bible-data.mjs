@@ -371,14 +371,22 @@ function glossFromStrongs(lexicon, strongs) {
   return entry.definition.split(/[;,]/)[0]?.trim() || null;
 }
 
-function lemmaToStrongsGuess(lemma, lexicon) {
-  const clean = stripDiacritics(lemma.replace(/[,;.:()]+$/g, "")).toLowerCase();
+function normalizeGreekLemma(lemma) {
+  return stripDiacritics(lemma.replace(/[,;.:()]+$/g, "")).toLowerCase();
+}
+
+function buildGreekLemmaIndex(lexicon) {
+  const index = new Map();
   for (const [num, entry] of Object.entries(lexicon)) {
     if (entry.language !== "greek") continue;
-    const el = stripDiacritics(entry.lemma ?? "").toLowerCase();
-    if (el === clean) return num;
+    const key = normalizeGreekLemma(entry.lemma ?? "");
+    if (key && !index.has(key)) index.set(key, num);
   }
-  return null;
+  return index;
+}
+
+function lemmaToStrongsGuess(lemma, greekLemmaIndex) {
+  return greekLemmaIndex.get(normalizeGreekLemma(lemma)) ?? null;
 }
 
 function writeStudyChapter(bookId, chapter, data) {
@@ -389,6 +397,7 @@ function writeStudyChapter(bookId, chapter, data) {
 
 async function buildMorphGnt(lexicon) {
   console.log("\n🇬🇷 Building Greek word study index...");
+  const greekLemmaIndex = buildGreekLemmaIndex(lexicon);
   let chapterCount = 0;
   let nextIndex = 0;
   let firstError = null;
@@ -427,7 +436,7 @@ async function buildMorphGnt(lexicon) {
           const vk = String(verse);
           if (!byChapter[chapter].verses[vk]) byChapter[chapter].verses[vk] = [];
 
-          const strongs = lemmaToStrongsGuess(lemma, lexicon);
+          const strongs = lemmaToStrongsGuess(lemma, greekLemmaIndex);
           const strongsEntry = strongs ? lexicon[strongs] : null;
           const pos = morph.replace(/-$/, "").charAt(0).toUpperCase() || parseMorphPos(morph);
 
